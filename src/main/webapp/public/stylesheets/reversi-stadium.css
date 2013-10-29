@@ -1,0 +1,76 @@
+
+/* ---[GENERIC DEFINITIONS]---------------------------------------------------------------------- */
+
+body {
+  background           : #FFFFFF;
+  color                : #534741;
+  font-family          : sans-serif, helvetica, tahoma;
+  font-size            : 11pt;
+  line-height          : 120%;
+  letter-spacing       : 0.03em;
+  margin               : 0px;
+  padding              : 0px;
+  text-align           : center; /* centers container for ie */
+  word-spacing         : 0.05em;
+}
+
+div, img, ul, ol, li, form, input, button, h1, h2, h3, h4 {
+  border               : none;
+  margin               : 0;
+  padding              : 0;
+  text-align           : left;
+}
+
+li {
+  list-style-type      : none;
+}
+
+a {
+  color                : #7b0046;
+  text-decoration      : none;
+}
+
+a:hover {
+  color                : #ED145B;
+}
+
+.center {
+  text-align           : center;
+}
+
+.right {
+  text-align           : right;
+}
+
+/* ---[LAYOUT]----------------------------------------------------------------------------------- */
+
+/* --- MAIN CONTAINER --- */
+
+div#main_container {
+  background-color     : #EEFFFF;
+  margin-left          : auto;
+  margin-right         : auto;
+  padding-left         : 14px;
+  padding-right        : 14px;
+  width                : 920px;
+}
+
+table#reversi_board td {
+  height               : 30px;
+  margin               : 1px;
+  padding              : 0px;
+  text-align           : center;
+  width                : 30px;
+}
+
+table#reversi_board td.board_cell {
+  background-color     : #00A80C;
+}
+
+div#board_section {
+  float                : left;
+}
+
+div#form_section {
+  float                : left;
+}
