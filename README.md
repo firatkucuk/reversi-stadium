@@ -16,7 +16,7 @@ An other easy running method is using embedded jetty maven plugin. You may run p
 
 Game Creation
 -------------
-By default you can create a single game from index page of the application. Type `http://IP_ADDRESS:PORT/revesi-stadium/` to your favouite browsers address bar. Then click **"Start a New Game"** button.
+By default you can create a single game from index page of the application. Type `http://IP_ADDRESS:PORT/revesi-stadium/` to your favouite browser's address bar. Then click **"Start a New Game"** button.
 
 ### Game Creation Using ReST API
 
@@ -112,7 +112,7 @@ Server: Jetty(9.0.0.M4)
 Running Game Cancellation
 -------------------------
 
-
+**Reversi Stadium** web application provides a securily game cancellation by using application main page. Type `http://IP_ADDRESS:PORT/revesi-stadium/` to your favouite browser's address bar. Then click **"Cancel Running Game"** button.
 
 
 
