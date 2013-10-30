@@ -9,7 +9,7 @@ function showGameStartForm(contextPath, started) {
     var text = '';
   
     text += '<form id="game_start_form" onsubmit="return startGame(\'' + contextPath + '\');">';
-    text += '  <input type="submit" value="Start Game" />';
+    text += '  <input type="submit" value="Start a New Game" />';
     text += '</form>';
   
     $("div#form_section").html(text);
@@ -27,7 +27,7 @@ function showGameCancelForm(contextPath, started) {
     
     text += '<form id="game_cancel_form" onsubmit="return cancelGame(\'' + contextPath + '\');">';
     text += '  <b>Cancellation Code:</b>&nbsp;<input id="cancellation_code" type="text" value="" /><br />';
-    text += '  <input type="submit" value="Cancel Game" />';
+    text += '  <input type="submit" value="Cancel Running Game" />';
     text += '</form>';
   
     $("div#form_section").html(text);
