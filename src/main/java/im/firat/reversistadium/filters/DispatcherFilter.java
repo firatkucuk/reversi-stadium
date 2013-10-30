@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 
-@WebFilter(urlPatterns = { "/", "/status", "/status/", "/start", "/start/", "/cancel*", "/move/*" })
+@WebFilter(urlPatterns = { "/", "/status", "/status/", "/start", "/start/", "/cancel/*", "/move/*" })
 public class DispatcherFilter implements Filter {
 
 

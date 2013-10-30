@@ -14,7 +14,7 @@ body {
   word-spacing         : 0.05em;
 }
 
-div, img, ul, ol, li, form, input, button, h1, h2, h3, h4 {
+div, img, ul, ol, li, form, h1, h2, h3, h4 {
   border               : none;
   margin               : 0;
   padding              : 0;
@@ -25,37 +25,30 @@ li {
   list-style-type      : none;
 }
 
-a {
-  color                : #7b0046;
-  text-decoration      : none;
-}
-
-a:hover {
-  color                : #ED145B;
-}
-
-.center {
-  text-align           : center;
-}
-
-.right {
-  text-align           : right;
+h1 {
+  color                : maroon;
+  text-shadow          : 2px 2px #CCCCCC;
 }
 
 /* ---[LAYOUT]----------------------------------------------------------------------------------- */
 
-/* --- MAIN CONTAINER --- */
-
 div#main_container {
-  background-color     : #EEFFFF;
+  background-color     : #FFFFFF;
+  height               : 500px;
   margin-left          : auto;
   margin-right         : auto;
   padding-left         : 14px;
   padding-right        : 14px;
+  padding-top          : 14px;
   width                : 920px;
 }
 
+table#reversi_board {
+  border-collapse      : collapse;
+}
+
 table#reversi_board td {
+  border               : 1px solid #5C5C5C;
   height               : 30px;
   margin               : 1px;
   padding              : 0px;
@@ -67,10 +60,40 @@ table#reversi_board td.board_cell {
   background-color     : #00A80C;
 }
 
+table#reversi_board td.corner {
+  background-color     : #5C5C5C;
+}
+
+table#reversi_board td.title {
+  color                : #534741;
+  font-weight          : bold;
+}
+
 div#board_section {
   float                : left;
+  margin               : 20px;
+}
+
+div#score_section {
+  margin               : 0px 20px 20px 360px;
 }
 
 div#form_section {
+  margin               : 0px 20px 20px 360px;
+}
+
+div.frame {
+  border-bottom        : 1px solid #5C5C5C;
+  height               : 30px;
+  padding              : 10px;
+  margin-bottom        : 10px;
+}
+
+div.label {
   float                : left;
+  font-weight          : bold;
+}
+
+div.input {
+  float                : right;
 }
