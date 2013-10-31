@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/javaee"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 		  http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-           version="3.0">
+         version="3.0">
 
   <filter>
     <filter-name>DispatcherFilter</filter-name>
     <filter-class>im.firat.reversistadium.filters.DispatcherFilter</filter-class>
   </filter>
+  
+  <filter-mapping>
+    <filter-name>DispatcherFilter</filter-name>
+    <url-pattern>/</url-pattern>
+    <url-pattern>/status</url-pattern>
+    <url-pattern>/status/</url-pattern>
+    <url-pattern>/start/</url-pattern>
+    <url-pattern>/start/</url-pattern>
+    <url-pattern>/cancel/*</url-pattern>
+    <url-pattern>/move/*</url-pattern>
+  </filter-mapping>
 </web-app>

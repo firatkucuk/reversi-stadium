@@ -29,6 +29,11 @@ public class GameController {
 
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
+    /**
+     * Main index page controller
+     *
+     * @return
+     */
     public String showIndex() {
 
         request.setAttribute("contextPath", request.getContextPath());

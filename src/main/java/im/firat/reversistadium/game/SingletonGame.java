@@ -1,10 +1,11 @@
 
 package im.firat.reversistadium.game;
 
-import java.util.Random;
 
-
-
+/**
+ * Reversi-Stadium supports one game instance at one time. This class adds singleton access to Game and Reversi Game
+ * classes.
+ */
 public class SingletonGame {
 
 

@@ -1,5 +1,5 @@
-package im.firat.reversistadium.filters;
 
+package im.firat.reversistadium.filters;
 
 import im.firat.reversistadium.controllers.GameController;
 import im.firat.reversistadium.controllers.RestController;
