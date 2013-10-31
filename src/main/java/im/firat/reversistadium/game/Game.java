@@ -8,6 +8,10 @@ import java.util.Random;
 
 
 
+/**
+ * Game class provides authentication layer to ReversiGame class. All operations about ReversiGame use this class
+ * directly. And also this class directs start, cancel, move operations to ReversiGame class
+ */
 public class Game implements Serializable {
 
 
@@ -39,6 +43,14 @@ public class Game implements Serializable {
 
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
+    /**
+     * Directs cancel operation to Reversi Game class instance and adds authenticated cancellation.
+     *
+     * @param   cancellationCode  required code for running game cancellation
+     *
+     * @throws  WrongCodeException   if cancellation code is wrong
+     * @throws  NotStartedException  if game is not started yet
+     */
     public void cancel(String cancellationCode) throws WrongCodeException, NotStartedException {
 
         if (cancellationCode.equals(this.cancellationCode)) {
@@ -88,13 +100,24 @@ public class Game implements Serializable {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public void move(String authCode, String piece) throws WrongCodeException, NotStartedException,
+    /**
+     * Directs move operation to ReversiGame class instance and adds security layer.
+     *
+     * @param   authCode     authentication code of current player
+     * @param   desiredMove  desired in move in string format c4, a8 etc.
+     *
+     * @throws  WrongCodeException    if player code is wrong
+     * @throws  NotStartedException   if game is not started yet
+     * @throws  IllegalMoveException  if move is illegal
+     * @throws  WrongOrderException   if current order is other players order
+     */
+    public void move(String authCode, String desiredMove) throws WrongCodeException, NotStartedException,
         IllegalMoveException, WrongOrderException {
 
         if (authCode.equals(playerBlackAuthCode)) {
-            reversiGame.move(piece, Constants.BLACK_PLAYER);
+            reversiGame.move(desiredMove, Constants.BLACK_PLAYER);
         } else if (authCode.equals(playerWhiteAuthCode)) {
-            reversiGame.move(piece, Constants.WHITE_PLAYER);
+            reversiGame.move(desiredMove, Constants.WHITE_PLAYER);
         } else {
             throw new WrongCodeException();
         }
@@ -104,6 +127,11 @@ public class Game implements Serializable {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Directs start operation to ReversiGame class instance
+     *
+     * @throws  AlreadyStartedException  if game is already started
+     */
     public void start() throws AlreadyStartedException {
 
         playerBlackAuthCode = generateAuthCode();
@@ -117,6 +145,11 @@ public class Game implements Serializable {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Creates simple, readable, 8 chars length, random codes
+     *
+     * @return  created random authentication code
+     */
     private String generateAuthCode() {
 
         StringBuffer authCode = new StringBuffer();

@@ -2,6 +2,9 @@
 package im.firat.reversistadium.game;
 
 
+/**
+ * General purpose constants for reversi game
+ */
 public class Constants {
 
 
