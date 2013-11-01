@@ -115,4 +115,106 @@ Running Game Cancellation
 **Reversi Stadium** web application provides a securily game cancellation by using application main page. Type `http://IP_ADDRESS:PORT/revesi-stadium/` to your favouite browser's address bar. Then click **"Cancel Running Game"** button.
 
 
+```
+DELETE http://IP_ADDRESS:PORT/cancel/cancellationCode
+```
 
+`200` game successfully cancelled. Returns JSON status data.
+`404` No active running game.
+`403` Wrong cancellation code.
+
+```
+curl -i -H "Accept: application/json" -X DELETE http://localhost:8080/reversi-stadium/cancel/abcd1234efgh5678
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 330
+Server: Jetty(9.0.0.M4)
+
+{
+  "boardState": [
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,2,1,0,0,0],
+    [0,0,0,1,2,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0]
+  ],
+  "cancelled": false,
+  "currentPlayer": 1,
+  "started": true
+}
+```
+
+Moving Pieces
+-------------
+
+```
+PUT http://IP_ADDRESS:PORT/move/playerAuthenticationCode/location
+```
+
+`200` Piece succesfully moved.
+`404` No active running game.
+`403` Wrong authentication code or wrong player order
+`400` Illegal move
+
+```
+curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/move/abcd1234/c4
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 330
+Server: Jetty(9.0.0.M4)
+
+{
+  "boardState": [
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,2,1,0,0,0],
+    [0,0,0,1,2,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0]
+  ],
+  "cancelled": false,
+  "currentPlayer": 1,
+  "started": true
+}
+```
+
+Getting Game Status
+-------------------
+
+```
+GET http://IP_ADDRESS:PORT/status
+```
+
+`200` Returns json status
+
+```
+curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/status
+
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 330
+Server: Jetty(9.0.0.M4)
+
+{
+  "boardState": [
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,2,1,0,0,0],
+    [0,0,0,1,2,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0],
+    [0,0,0,0,0,0,0,0]
+  ],
+  "cancelled": false,
+  "currentPlayer": 1,
+  "started": true
+}
+```
