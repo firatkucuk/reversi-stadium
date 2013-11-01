@@ -208,6 +208,16 @@ public class ReversiGame implements Serializable {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
+    @Override
+    public String toString() {
+
+        return Utils.getBoardStateRepresentation(boardState);
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
     /**
      * Scans all directions for valid pattern. Valid pattern:
      *
