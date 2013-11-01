@@ -77,7 +77,7 @@ public class RestController {
         try {
             game.move(authCode, piece);
             LOG.info("Player(" + authCode + ") moved disk to location " + piece);
-            LOG.debug("\n" + Utils.getBoardStateRepresentation(game.getReversiGame().getBoardState()));
+            LOG.debug("\n" + game.getReversiGame());
 
             response.setContentType("application/json");
             out.print(new GsonBuilder().create().toJson(reversiGame));
@@ -118,7 +118,7 @@ public class RestController {
             LOG.info("Cancellation Code: " + game.getCancellationCode());
             LOG.info("Player Black Auth Code: " + game.getPlayerBlackAuthCode());
             LOG.info("Player White Auth Code: " + game.getPlayerWhiteAuthCode());
-            LOG.debug("\n" + Utils.getBoardStateRepresentation(game.getReversiGame().getBoardState()));
+            LOG.debug("\n" + game.getReversiGame());
 
             response.setContentType("application/json");
             out.print(new GsonBuilder().create().toJson(game));
