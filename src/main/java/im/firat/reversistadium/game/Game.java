@@ -159,7 +159,9 @@ public class Game implements Serializable {
             authCode.append(ALPHABET.charAt(random.nextInt(26)));
         }
 
-        authCode.append(random.nextInt(9999));
+        for (int i = 0; i < 4; i++) {
+            authCode.append(random.nextInt(10));
+        }
 
         return authCode.toString();
     }
