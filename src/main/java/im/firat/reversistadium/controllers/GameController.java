@@ -12,8 +12,8 @@ public class GameController {
 
     //~ --- [INSTANCE FIELDS] ------------------------------------------------------------------------------------------
 
-    private HttpServletRequest  request;
-    private HttpServletResponse response;
+    private final HttpServletRequest  request;
+    private final HttpServletResponse response;
 
 
 
@@ -32,7 +32,7 @@ public class GameController {
     /**
      * Main index page controller
      *
-     * @return
+     * @return  returns main index page
      */
     public String showIndex() {
 

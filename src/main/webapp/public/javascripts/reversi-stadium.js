@@ -115,7 +115,7 @@ function startGame(contextPath) {
         200: function(data) {        
           var alertText = '';
 
-          showGameCancelForm(contextPath);
+          showGameCancelForm(contextPath, true);
           
           alertText += 'Game Codes\n';
           alertText += '_______________________________________________\n';

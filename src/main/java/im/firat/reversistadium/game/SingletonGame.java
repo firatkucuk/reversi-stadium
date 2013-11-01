@@ -12,7 +12,7 @@ public class SingletonGame {
 
     //~ --- [STATIC FIELDS/INITIALIZERS] -------------------------------------------------------------------------------
 
-    private static Game game = new Game();
+    private static final Game game = new Game();
 
 
 

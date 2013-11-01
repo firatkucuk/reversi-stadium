@@ -3,7 +3,7 @@ package im.firat.reversistadium.game;
 
 
 /**
- * General purpose constants for reversi game
+ * General purpose constants for Reversi game
  */
 public class Constants {
 
@@ -22,12 +22,6 @@ public class Constants {
     public static final int NO_PLAYER    = 0;
     public static final int BLACK_PLAYER = 1;
     public static final int WHITE_PLAYER = 2;
-
-    // Direction states
-    public static final int DS_NO_VALID_PATH          = -1;
-    public static final int DS_START                  = 0;
-    public static final int DS_WAITING_FOR_SAME_COLOR = 1;
-    public static final int DS_OCCUPIED               = 2;
 
 
 
