@@ -25,10 +25,11 @@ public class Game implements Serializable {
 
     //~ --- [INSTANCE FIELDS] ------------------------------------------------------------------------------------------
 
-    private String      cancellationCode;
-    private String      playerBlackAuthCode;
-    private String      playerWhiteAuthCode;
-    private ReversiGame reversiGame;
+    private String cancellationCode;
+    private String playerBlackAuthCode;
+    private String playerWhiteAuthCode;
+
+    private final ReversiGame reversiGame;
 
 
 
@@ -152,8 +153,8 @@ public class Game implements Serializable {
      */
     private String generateAuthCode() {
 
-        StringBuffer authCode = new StringBuffer();
-        Random       random   = new Random();
+        StringBuilder authCode = new StringBuilder();
+        Random        random   = new Random();
 
         for (int i = 0; i < 4; i++) {
             authCode.append(ALPHABET.charAt(random.nextInt(26)));

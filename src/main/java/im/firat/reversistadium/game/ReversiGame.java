@@ -44,7 +44,7 @@ public class ReversiGame implements Serializable {
         started       = false;
         cancelled     = false;
         currentPlayer = NO_PLAYER;
-        boardState    = Arrays.<List<Integer>>asList(
+        boardState    = Arrays.asList(
 
             //            a  b  c  d  e  f  g  h
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 1
@@ -119,7 +119,6 @@ public class ReversiGame implements Serializable {
      *
      * @throws  NotStartedException   if game is not started
      * @throws  IllegalMoveException  if actual move is illegal
-     * @throws  WrongOrderException   if current order is other players order
      */
     public synchronized void move(String desiredMove) throws NotStartedException, IllegalMoveException {
 
@@ -137,9 +136,7 @@ public class ReversiGame implements Serializable {
 
         if (haveLegalMovesForPlayer(otherPlayer)) {
             currentPlayer = otherPlayer;
-        } else if (haveLegalMovesForPlayer(currentPlayer)) {
-            // Nothing to do
-        } else {
+        } else if (!haveLegalMovesForPlayer(currentPlayer)) {
             started       = false;
             currentPlayer = NO_PLAYER;
         }
@@ -193,7 +190,7 @@ public class ReversiGame implements Serializable {
         started       = true;
         cancelled     = false;
         currentPlayer = BLACK_PLAYER;
-        boardState    = Arrays.<List<Integer>>asList(
+        boardState    = Arrays.asList(
 
             //            a  b  c  d  e  f  g  h
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 1
@@ -212,128 +209,64 @@ public class ReversiGame implements Serializable {
     //~ ----------------------------------------------------------------------------------------------------------------
 
     /**
-     * Searches occupiable paths according to execution mode. Scans all directions in every step.
+     * Scans all directions for valid pattern. Valid pattern:
      *
      * <pre>
-         Directions:
-
-         7  0  1
-          \ | /
-           \|/
-         6--+--2
-           /|\
-          / | \
-         5  4  3
-
-
-         Step: 1
-
-         [0] [1] [1]
-         [2] [S] [1]
-         [0] [0] [0]
-
-         Step: 2
-
-         [2]     [1]     [1]
-             [0] [1] [1]
-         [2] [2] [S] [1] [0]
-             [0] [0] [0]
-         [1]     [1]    [1]
-
-         Step: 3
-
-         [2]         [1]         [1]
-             [2]     [1]     [1]
-                 [0] [1] [1]
-         [2] [2] [2] [2] [S] [1] [0]
-                 [0] [0] [0]
-             [1]     [1]     [1]
-         [2]         [1]         [1]
-
-          etc.
+        [SAME COLOR] [DIFF. COLOR] ... [DIFF. COLOR] [TARGET]
      * </pre>
      *
-     * @param   startRow
-     * @param   startCol
-     * @param   player
-     * @param   executionMode
+     * pattern rules:
      *
-     * @return  Returns true if a path found
+     * <ol>
+     * <li>Target location cannot be an empty place.</li>
+     * <li>Location before target location should be in different color according to current player</li>
+     * <li>Pattern should start with same color according to current player</li>
+     * </ol>
+     *
+     * @param   targetRow      row value of target location
+     * @param   targetCol      col value of target location
+     * @param   player         player value for pattern validation
+     * @param   executionMode  1 for legal move search, 2 form occupy scan
+     *
+     * @return  Returns true if valid pattern found.
      */
-    private boolean directionGrowScan(int startRow, int startCol, int player, int executionMode) {
+    private boolean directionScan(int targetRow, int targetCol, int player, int executionMode) {
 
-        if (boardState.get(startRow).get(startCol) != EMPTY_PLACE) {
+        if (boardState.get(targetRow).get(targetCol) != EMPTY_PLACE) {
             return false;
         }
 
-        boolean pathFound       = false;
-        int[]   directionStates = { DS_START, DS_START, DS_START, DS_START, DS_START, DS_START, DS_START, DS_START };
+        boolean pathFound = false;
 
         final int DIFFERENT_COLOR = player == WHITE_PLAYER ? BLACK_DISK : WHITE_DISK;
+        final int SAME_COLOR      = player;
 
-        stepLoop:
-        for (int step = 1; step < 8; step++) {
+        for (int direction = 0; direction < 8; direction++) {
 
-            for (int direction = 0; direction < 8; direction++) {
+            int value = getPositionValue(targetRow, targetCol, direction, 1);
 
-                if (directionStatesFinalized(directionStates)) {
-                    break stepLoop;
-                }
+            if (value == DIFFERENT_COLOR) {
 
-                int directionState = directionStates[direction];
+                for (int step = 2; step < 8; step++) {
 
-                if (directionState == DS_NO_VALID_PATH) {
-                    // Nothing to do
-                } else {
-                    int directionValue = getPositionValue(startRow, startCol, direction, step);
+                    value = getPositionValue(targetRow, targetCol, direction, step);
 
-                    if (directionState == DS_START) {
+                    if (value == END_OF_DIRECTION || value == EMPTY_PLACE) {
+                        break;
+                    } else if (value == SAME_COLOR && executionMode == DGSEM_LEGAL_MOVE_SEARCH) {
+                        return true;
+                    } else if (value == SAME_COLOR && executionMode == DGSEM_OCCUPY_SCAN) {
+                        occupyPath(targetRow, targetCol, direction, step);
+                        pathFound = true;
 
-                        if (directionValue == DIFFERENT_COLOR) {
-                            directionStates[direction] = DS_WAITING_FOR_SAME_COLOR;
-                        } else {
-                            directionStates[direction] = DS_NO_VALID_PATH;
-                        }
-                    } else if (directionState == DS_WAITING_FOR_SAME_COLOR) {
+                        break;
+                    }
+                } // end for
+            }
+        }         // end for
 
-                        if (directionValue == END_OF_DIRECTION || directionValue == EMPTY_PLACE) {
-                            directionStates[direction] = DS_NO_VALID_PATH;
-                        } else if (directionValue == DIFFERENT_COLOR) {
-                            // Nothing to do
-                        } else {
-
-                            if (executionMode == DGSEM_LEGAL_MOVE_SEARCH) {
-                                return true;
-                            } else if (executionMode == DGSEM_OCCUPY_SCAN) {
-                                occupyPath(startRow, startCol, direction, step);
-
-                                directionStates[direction] = DS_OCCUPIED;
-                                pathFound                  = true;
-                            }
-                        }
-                    } // end if-else
-                }     // end if-else
-            }         // end for
-        }             // end for
 
         return pathFound;
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    private boolean directionStatesFinalized(int[] directionStates) {
-
-        for (int i = 0; i < directionStates.length; i++) {
-            int directionState = directionStates[i];
-
-            if (directionState == DS_START || directionState == DS_WAITING_FOR_SAME_COLOR) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
 
@@ -439,8 +372,6 @@ public class ReversiGame implements Serializable {
      * @param   player  1 for black, 2 for white
      *
      * @return  returns true if there is at lease one legal move
-     *
-     * @throws  IllegalMoveException  if move is illegal
      */
     private boolean haveLegalMovesForPlayer(int player) {
 
@@ -476,15 +407,13 @@ public class ReversiGame implements Serializable {
      *
      * @param   startRow  start position row. 3 for f4 location
      * @param   startCol  start position col. 5 for f4 location
-     * @param   player
+     * @param   player    player value for legal move search
      *
      * @return  returns if move is legal or illegal
-     *
-     * @throws  IllegalMoveException
      */
     private boolean isLegalMove(int startRow, int startCol, int player) {
 
-        return directionGrowScan(startRow, startCol, player, DGSEM_LEGAL_MOVE_SEARCH);
+        return directionScan(startRow, startCol, player, DGSEM_LEGAL_MOVE_SEARCH);
     }
 
 
@@ -501,7 +430,7 @@ public class ReversiGame implements Serializable {
      */
     private void occupyDisks(int startRow, int startCol) throws IllegalMoveException {
 
-        if (!directionGrowScan(startRow, startCol, currentPlayer, DGSEM_OCCUPY_SCAN)) {
+        if (!directionScan(startRow, startCol, currentPlayer, DGSEM_OCCUPY_SCAN)) {
             throw new IllegalMoveException();
         }
     }

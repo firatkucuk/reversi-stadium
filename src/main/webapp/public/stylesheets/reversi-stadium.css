@@ -4,12 +4,12 @@
 body {
   background           : #FFFFFF;
   color                : #534741;
-  font-family          : sans-serif, helvetica, tahoma;
+  font-family          : sans-serif, helvetica, tahoma, serif;
   font-size            : 11pt;
   line-height          : 120%;
   letter-spacing       : 0.03em;
-  margin               : 0px;
-  padding              : 0px;
+  margin               : 0;
+  padding              : 0;
   text-align           : center; /* centers container for ie */
   word-spacing         : 0.05em;
 }
@@ -51,7 +51,7 @@ table#reversi_board td {
   border               : 1px solid #5C5C5C;
   height               : 30px;
   margin               : 1px;
-  padding              : 0px;
+  padding              : 0;
   text-align           : center;
   width                : 30px;
 }
@@ -75,11 +75,11 @@ div#board_section {
 }
 
 div#score_section {
-  margin               : 0px 20px 20px 360px;
+  margin               : 0 20px 20px 360px;
 }
 
 div#form_section {
-  margin               : 0px 20px 20px 360px;
+  margin               : 0 20px 20px 360px;
 }
 
 div.frame {

@@ -6,6 +6,7 @@ import im.firat.reversistadium.exceptions.*;
 import im.firat.reversistadium.game.Game;
 import im.firat.reversistadium.game.ReversiGame;
 import im.firat.reversistadium.game.SingletonGame;
+import im.firat.reversistadium.game.Utils;
 import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -27,11 +28,11 @@ public class RestController {
 
     //~ --- [INSTANCE FIELDS] ------------------------------------------------------------------------------------------
 
-    private Game                game;
-    private ServletOutputStream out;
-    private HttpServletRequest  request;
-    private HttpServletResponse response;
-    private ReversiGame         reversiGame;
+    private final Game                game;
+    private final ServletOutputStream out;
+    private final HttpServletRequest  request;
+    private final HttpServletResponse response;
+    private final ReversiGame         reversiGame;
 
 
 
@@ -76,6 +77,7 @@ public class RestController {
         try {
             game.move(authCode, piece);
             LOG.info("Player(" + authCode + ") moved disk to location " + piece);
+            LOG.debug(Utils.getBoardStateRepresentation(game.getReversiGame().getBoardState()));
 
             response.setContentType("application/json");
             out.print(new GsonBuilder().create().toJson(reversiGame));
@@ -116,6 +118,7 @@ public class RestController {
             LOG.info("Cancellation Code: " + game.getCancellationCode());
             LOG.info("Player Black Auth Code: " + game.getPlayerBlackAuthCode());
             LOG.info("Player White Auth Code: " + game.getPlayerWhiteAuthCode());
+            LOG.debug(Utils.getBoardStateRepresentation(game.getReversiGame().getBoardState()));
 
             response.setContentType("application/json");
             out.print(new GsonBuilder().create().toJson(game));
