@@ -1,7 +1,6 @@
 
 package im.firat.reversistadium.controllers;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import im.firat.reversistadium.exceptions.*;
 import im.firat.reversistadium.game.Game;
@@ -11,10 +10,18 @@ import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
 public class RestController {
+
+
+
+    //~ --- [STATIC FIELDS/INITIALIZERS] -------------------------------------------------------------------------------
+
+    private static final Logger LOG = LoggerFactory.getLogger(RestController.class);
 
 
 
@@ -47,12 +54,15 @@ public class RestController {
 
         try {
             game.cancel(cancellationCode);
+            LOG.info("Game cancelled!");
 
             response.setContentType("application/json");
             out.print(new GsonBuilder().create().toJson(reversiGame));
         } catch (NotStartedException e) {
+            LOG.warn("Cancellation aborted. No active game found!");
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } catch (WrongCodeException ex) {
+            LOG.warn("Cancellation aborted. Wrong cancellation code.!");
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
         }
     }
@@ -65,16 +75,21 @@ public class RestController {
 
         try {
             game.move(authCode, piece);
+            LOG.info("Player(" + authCode + ") moved disk to location " + piece);
 
             response.setContentType("application/json");
             out.print(new GsonBuilder().create().toJson(reversiGame));
         } catch (NotStartedException e) {
+            LOG.warn("Move aborted. No active game found!");
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } catch (WrongCodeException ex) {
+            LOG.warn("Move aborted. Wrong authentication code!");
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
         } catch (WrongOrderException e) {
+            LOG.warn("Move aborted. Wrong authentication code!");
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
         } catch (IllegalMoveException e) {
+            LOG.warn("Move aborted. Requested illegal move!");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
@@ -97,10 +112,15 @@ public class RestController {
 
         try {
             game.start();
+            LOG.info("New game started!");
+            LOG.info("Cancellation Code: " + game.getCancellationCode());
+            LOG.info("Player Black Auth Code: " + game.getPlayerBlackAuthCode());
+            LOG.info("Player White Auth Code: " + game.getPlayerWhiteAuthCode());
 
             response.setContentType("application/json");
             out.print(new GsonBuilder().create().toJson(game));
         } catch (AlreadyStartedException ex) {
+            LOG.warn("Game start aborted! There is already a running game.");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
