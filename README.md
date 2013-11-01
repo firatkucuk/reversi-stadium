@@ -120,7 +120,9 @@ DELETE http://IP_ADDRESS:PORT/cancel/cancellationCode
 ```
 
 `200` game successfully cancelled. Returns JSON status data.
+
 `404` No active running game.
+
 `403` Wrong cancellation code.
 
 ```
