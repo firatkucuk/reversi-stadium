@@ -28,7 +28,28 @@ public class ReversiGame implements Serializable {
 
     //~ --- [INSTANCE FIELDS] ------------------------------------------------------------------------------------------
 
-    /** { player: {cell: [occupiable paths]} } */
+    /**
+     * <pre>
+        {
+           1: { // Found paths for black player
+              'e1': { // Path Object
+                'targetRow': 0,
+                'targetCol': 4,
+                'direction': 0,
+                'step'     : 2
+              }
+           },
+           2: { // Found paths for white player
+              'a5': { // Path Object
+                'targetRow': 4,
+                'targetCol': 0,
+                'direction': 6,
+                'step'     : 2
+              }
+           }
+        }
+     * </pre>
+     */
     private Map<Integer, Map<String, List<Path>>> availablePaths;
     private List<List<Integer>>                   boardState;
     private boolean                               cancelled;
@@ -47,15 +68,16 @@ public class ReversiGame implements Serializable {
         currentPlayer = NO_PLAYER;
         boardState    = Arrays.asList(
 
-            //            a  b  c  d  e  f  g  h
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 1
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 2
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 3
-            Arrays.<Integer>asList(0, 0, 0, 2, 1, 0, 0, 0),     // 4
-            Arrays.<Integer>asList(0, 0, 0, 1, 2, 0, 0, 0),     // 5
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 6
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8
+            //                     0  1  2  3  4  5  6  7
+            //                     a  b  c  d  e  f  g  h
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 1 0
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 2 1
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 3 2
+            Arrays.<Integer>asList(0, 0, 0, 2, 1, 0, 0, 0),     // 4 3
+            Arrays.<Integer>asList(0, 0, 0, 1, 2, 0, 0, 0),     // 5 4
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 6 5
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7 6
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
             );
     }
 
@@ -196,21 +218,21 @@ public class ReversiGame implements Serializable {
             throw new AlreadyStartedException();
         }
 
-        availablePaths = new HashMap<Integer, Map<String, List<Path>>>();
-        started        = true;
-        cancelled      = false;
-        currentPlayer  = BLACK_PLAYER;
-        boardState     = Arrays.asList(
+        started       = true;
+        cancelled     = false;
+        currentPlayer = BLACK_PLAYER;
+        boardState    = Arrays.asList(
 
+            //                     0  1  2  3  4  5  6  7
             //                     a  b  c  d  e  f  g  h
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 1
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 2
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 3
-            Arrays.<Integer>asList(0, 0, 0, 2, 1, 0, 0, 0),     // 4
-            Arrays.<Integer>asList(0, 0, 0, 1, 2, 0, 0, 0),     // 5
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 6
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 1 0
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 2 1
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 3 2
+            Arrays.<Integer>asList(0, 0, 0, 2, 1, 0, 0, 0),     // 4 3
+            Arrays.<Integer>asList(0, 0, 0, 1, 2, 0, 0, 0),     // 5 4
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 6 5
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7 6
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
             );
 
         updateAvailablePaths();
@@ -240,7 +262,11 @@ public class ReversiGame implements Serializable {
      */
     private String convertLocationToText(int row, int col) {
 
-        return BOARD_CHARS[col] + "" + (row + 1);
+        StringBuilder text = new StringBuilder();
+        text.append(BOARD_CHARS[col]);
+        text.append(row + 1);
+
+        return text.toString();
     }
 
 
@@ -318,21 +344,21 @@ public class ReversiGame implements Serializable {
      *
      * If start position is c4 and step is 3 then target location is f4 and the value is 1.
      *
-     * @param   targetRow  start position row. 3 for f4 location
-     * @param   targetCol  start position col. 5 for f4 location
+     * @param   row        start position row. 3 for f4 location
+     * @param   col        start position col. 5 for f4 location
      * @param   direction  direction number. Range 0 - 7
      * @param   step       translation distance
      *
      * @return  -1 for out of bound locations, 0 for empty locations, 1 for black disk, 2 for white disk
      */
-    private int getPositionValue(int targetRow, int targetCol, int direction, int step) {
+    private int getPositionValue(int row, int col, int direction, int step) {
 
         try {
-            int[] position = getTranslatedPosition(targetRow, targetCol, direction, step);
-            int   row      = position[0];
-            int   col      = position[1];
+            int[] position      = getTranslatedPosition(row, col, direction, step);
+            int   translatedRow = position[0];
+            int   translatedCol = position[1];
 
-            return boardState.get(row).get(col);
+            return boardState.get(translatedRow).get(translatedCol);
         } catch (OutOfBoundsException ex) {
             return END_OF_DIRECTION;
         }
@@ -518,7 +544,7 @@ public class ReversiGame implements Serializable {
                 // current player's disk color.
                 boardState.get(row).set(col, currentPlayer);
             } catch (OutOfBoundsException ex) {
-                // Nothing to do
+                break;
             }
         }
     }
@@ -563,7 +589,7 @@ public class ReversiGame implements Serializable {
      */
     private void updateAvailablePaths() {
 
-        availablePaths.clear();
+        availablePaths = new HashMap<Integer, Map<String, List<Path>>>(2);
 
         for (int player = 1; player <= 2; player++) {
 
