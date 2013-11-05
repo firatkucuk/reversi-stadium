@@ -3,15 +3,14 @@ package im.firat.reversistadium.game;
 
 import im.firat.reversistadium.exceptions.*;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static im.firat.reversistadium.game.Constants.*;
 
 
 
 /**
- * Main reversi game implementation.
+ * Simple Reversi Game implementation.
  */
 public class ReversiGame implements Serializable {
 
@@ -21,18 +20,20 @@ public class ReversiGame implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    // Direction grow scan execution modes
-    private static final int DGSEM_LEGAL_MOVE_SEARCH = 1;
-    private static final int DGSEM_OCCUPY_SCAN       = 2;
+    private static final String BOARD_LETTERS = "abcdefgh";
+    private static final String BOARD_NUMBERS = "12345678";
+    private static final char[] BOARD_CHARS   = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
 
 
 
     //~ --- [INSTANCE FIELDS] ------------------------------------------------------------------------------------------
 
-    private List<List<Integer>> boardState;
-    private boolean             cancelled;
-    private int                 currentPlayer;
-    private boolean             started;
+    /** { player: {cell: [occupiable paths]} } */
+    private Map<Integer, Map<String, List<Path>>> availablePaths;
+    private List<List<Integer>>                   boardState;
+    private boolean                               cancelled;
+    private int                                   currentPlayer;
+    private boolean                               started;
 
 
 
@@ -62,14 +63,20 @@ public class ReversiGame implements Serializable {
 
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
+    /**
+     * Cancels running game, saves board state and current player until next game start
+     *
+     * @throws  NotStartedException  If there is no running game
+     */
     public void cancel() throws NotStartedException {
 
         if (!started) {
             throw new NotStartedException();
         }
 
-        started   = false;
-        cancelled = true;
+        started        = false;
+        cancelled      = true;
+        availablePaths = null;
     }
 
 
@@ -127,18 +134,20 @@ public class ReversiGame implements Serializable {
         }
 
         char[] chars = desiredMove.toCharArray();
-        int    col   = "abcdefgh".indexOf(chars[0]);
-        int    row   = "12345678".indexOf(chars[1]);
+        int    col   = BOARD_LETTERS.indexOf(chars[0]);
+        int    row   = BOARD_NUMBERS.indexOf(chars[1]);
 
-        occupyDisks(row, col);
+        occupyPaths(row, col);
+        updateAvailablePaths();
 
         int otherPlayer = currentPlayer == BLACK_PLAYER ? WHITE_PLAYER : BLACK_PLAYER;
 
         if (haveLegalMovesForPlayer(otherPlayer)) {
             currentPlayer = otherPlayer;
         } else if (!haveLegalMovesForPlayer(currentPlayer)) {
-            started       = false;
-            currentPlayer = NO_PLAYER;
+            started        = false;
+            currentPlayer  = NO_PLAYER;
+            availablePaths = null;
         }
     }
 
@@ -187,12 +196,13 @@ public class ReversiGame implements Serializable {
             throw new AlreadyStartedException();
         }
 
-        started       = true;
-        cancelled     = false;
-        currentPlayer = BLACK_PLAYER;
-        boardState    = Arrays.asList(
+        availablePaths = new HashMap<Integer, Map<String, List<Path>>>();
+        started        = true;
+        cancelled      = false;
+        currentPlayer  = BLACK_PLAYER;
+        boardState     = Arrays.asList(
 
-            //            a  b  c  d  e  f  g  h
+            //                     a  b  c  d  e  f  g  h
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 1
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 2
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 3
@@ -202,6 +212,8 @@ public class ReversiGame implements Serializable {
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8
             );
+
+        updateAvailablePaths();
     }
 
 
@@ -219,10 +231,27 @@ public class ReversiGame implements Serializable {
     //~ ----------------------------------------------------------------------------------------------------------------
 
     /**
+     * Converts given location (row, col) to human readable board text
+     *
+     * @param   row  row value of given location
+     * @param   col  column value of given location
+     *
+     * @return  returns human readable location text. Converts (1, 7) to h2
+     */
+    private String convertLocationToText(int row, int col) {
+
+        return BOARD_CHARS[col] + "" + (row + 1);
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
+    /**
      * Scans all directions for valid pattern. Valid pattern:
      *
      * <pre>
-        [SAME COLOR] [DIFF. COLOR] ... [DIFF. COLOR] [TARGET]
+          [SAME COLOR] [DIFF. COLOR] ... [DIFF. COLOR] [TARGET]
      * </pre>
      *
      * pattern rules:
@@ -233,20 +262,19 @@ public class ReversiGame implements Serializable {
      * <li>Pattern should start with same color according to current player</li>
      * </ol>
      *
-     * @param   targetRow      row value of target location
-     * @param   targetCol      col value of target location
-     * @param   player         player value for pattern validation
-     * @param   executionMode  1 for legal move search, 2 form occupy scan
+     * @param   targetRow  row value of target location
+     * @param   targetCol  col value of target location
+     * @param   player     player value for pattern validation
      *
-     * @return  Returns true if valid pattern found.
+     * @return  Returns found path if valid pattern found.
      */
-    private boolean directionScan(int targetRow, int targetCol, int player, int executionMode) {
+    private List<Path> findAvailablePaths(int targetRow, int targetCol, int player) {
 
         if (boardState.get(targetRow).get(targetCol) != EMPTY_PLACE) {
-            return false;
+            return null;
         }
 
-        boolean pathFound = false;
+        List<Path> result = new ArrayList<Path>();
 
         final int DIFFERENT_COLOR = player == WHITE_PLAYER ? BLACK_DISK : WHITE_DISK;
         final int SAME_COLOR      = player;
@@ -263,11 +291,8 @@ public class ReversiGame implements Serializable {
 
                     if (value == END_OF_DIRECTION || value == EMPTY_PLACE) {
                         break;
-                    } else if (value == SAME_COLOR && executionMode == DGSEM_LEGAL_MOVE_SEARCH) {
-                        return true;
-                    } else if (value == SAME_COLOR && executionMode == DGSEM_OCCUPY_SCAN) {
-                        occupyPath(targetRow, targetCol, direction, step);
-                        pathFound = true;
+                    } else if (value == SAME_COLOR) {
+                        result.add(new Path(targetRow, targetCol, direction, step));
 
                         break;
                     }
@@ -275,8 +300,7 @@ public class ReversiGame implements Serializable {
             }
         }         // end for
 
-
-        return pathFound;
+        return result;
     }
 
 
@@ -294,17 +318,17 @@ public class ReversiGame implements Serializable {
      *
      * If start position is c4 and step is 3 then target location is f4 and the value is 1.
      *
-     * @param   startRow   start position row. 3 for f4 location
-     * @param   startCol   start position col. 5 for f4 location
+     * @param   targetRow  start position row. 3 for f4 location
+     * @param   targetCol  start position col. 5 for f4 location
      * @param   direction  direction number. Range 0 - 7
      * @param   step       translation distance
      *
      * @return  -1 for out of bound locations, 0 for empty locations, 1 for black disk, 2 for white disk
      */
-    private int getPositionValue(int startRow, int startCol, int direction, int step) {
+    private int getPositionValue(int targetRow, int targetCol, int direction, int step) {
 
         try {
-            int[] position = getTranslatedPosition(startRow, startCol, direction, step);
+            int[] position = getTranslatedPosition(targetRow, targetCol, direction, step);
             int   row      = position[0];
             int   col      = position[1];
 
@@ -329,8 +353,8 @@ public class ReversiGame implements Serializable {
      *
      * If start position is c4 and step is 3 then target location is f4. Returns [3, 5]
      *
-     * @param   startRow   start position row. 3 for f4 location
-     * @param   startCol   start position col. 5 for f4 location
+     * @param   targetRow  start position row. 3 for f4 location
+     * @param   targetCol  start position col. 5 for f4 location
      * @param   direction  direction number. Range 0 - 7
      * @param   step       translation distance
      *
@@ -338,31 +362,31 @@ public class ReversiGame implements Serializable {
      *
      * @throws  OutOfBoundsException
      */
-    private int[] getTranslatedPosition(int startRow, int startCol, int direction, int step)
+    private int[] getTranslatedPosition(int targetRow, int targetCol, int direction, int step)
         throws OutOfBoundsException {
 
-        int row = startRow, col = startCol;
+        int row = targetRow, col = targetCol;
 
         if (direction == 0) {
-            row = startRow - step;
+            row = targetRow - step;
         } else if (direction == 1) {
-            row = startRow - step;
-            col = startCol + step;
+            row = targetRow - step;
+            col = targetCol + step;
         } else if (direction == 2) {
-            col = startCol + step;
+            col = targetCol + step;
         } else if (direction == 3) {
-            row = startRow + step;
-            col = startCol + step;
+            row = targetRow + step;
+            col = targetCol + step;
         } else if (direction == 4) {
-            row = startRow + step;
+            row = targetRow + step;
         } else if (direction == 5) {
-            row = startRow + step;
-            col = startCol - step;
+            row = targetRow + step;
+            col = targetCol - step;
         } else if (direction == 6) {
-            col = startCol - step;
+            col = targetCol - step;
         } else if (direction == 7) {
-            row = startRow - step;
-            col = startCol - step;
+            row = targetRow - step;
+            col = targetCol - step;
         }
 
         if (row < 0 || col < 0 || row > 7 || col > 7) {
@@ -385,14 +409,10 @@ public class ReversiGame implements Serializable {
      */
     private boolean haveLegalMovesForPlayer(int player) {
 
-        for (int i = 0; i < 8; i++) {
+        Map<String, List<Path>> playerPaths = availablePaths.get(player);
 
-            for (int j = 0; j < 8; j++) {
-
-                if (isLegalMove(i, j, player)) {
-                    return true;
-                }
-            }
+        if (playerPaths.size() > 0) {
+            return true;
         }
 
         return false;
@@ -415,34 +435,24 @@ public class ReversiGame implements Serializable {
         5  4  3
      </pre>
      *
-     * @param   startRow  start position row. 3 for f4 location
-     * @param   startCol  start position col. 5 for f4 location
-     * @param   player    player value for legal move search
+     * @param   targetRow  start position row. 3 for f4 location
+     * @param   targetCol  start position col. 5 for f4 location
+     * @param   player     player value for legal move search
      *
      * @return  returns if move is legal or illegal
      */
-    private boolean isLegalMove(int startRow, int startCol, int player) {
+    private boolean isLegalMove(int targetRow, int targetCol, int player) {
 
-        return directionScan(startRow, startCol, player, DGSEM_LEGAL_MOVE_SEARCH);
-    }
+        if (availablePaths != null && !availablePaths.isEmpty()) {
 
+            Map<String, List<Path>> playerPaths = availablePaths.get(player);
 
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Searches all directions and occupies found paths
-     *
-     * @param   startRow  start position row. 3 for f4 location
-     * @param   startCol  start position col. 5 for f4 location
-     *
-     * @throws  IllegalMoveException  if move is illegal
-     */
-    private void occupyDisks(int startRow, int startCol) throws IllegalMoveException {
-
-        if (!directionScan(startRow, startCol, currentPlayer, DGSEM_OCCUPY_SCAN)) {
-            throw new IllegalMoveException();
+            if (playerPaths.containsKey(convertLocationToText(targetRow, targetCol))) {
+                return true;
+            }
         }
+
+        return false;
     }
 
 
@@ -453,28 +463,54 @@ public class ReversiGame implements Serializable {
      * Occupies path for current player
      *
      * <pre>
-              c   d   e   f   g
-          4  [2] [1] [1] [0] [0] >>> direction 2
+             c   d   e   f   g
+         4  [2] [1] [1] [0] [0] >>> direction 2
      * </pre>
      *
      * After occupation: (Direction: 2, Step: 3)
      *
      * <pre>
-              c   d   e   f   g
-          4  [2] [2] [2] [2] [0]  >>> direction 2
+             c   d   e   f   g
+         4  [2] [2] [2] [2] [0]  >>> direction 2
      * </pre>
      *
-     * @param  startRow   start position row. 3 for f4 location
-     * @param  startCol   start position col. 5 for f4 location
+     * @param  path  found path
+     */
+    private void occupyPath(Path path) {
+
+        occupyPath(path.getTargetRow(), path.getTargetCol(), path.getDirection(), path.getStep());
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Occupies path for current player
+     *
+     * <pre>
+             c   d   e   f   g
+         4  [2] [1] [1] [0] [0] >>> direction 2
+     * </pre>
+     *
+     * After occupation: (Direction: 2, Step: 3)
+     *
+     * <pre>
+             c   d   e   f   g
+         4  [2] [2] [2] [2] [0]  >>> direction 2
+     * </pre>
+     *
+     * @param  targetRow  start position row. 3 for f4 location
+     * @param  targetCol  start position col. 5 for f4 location
      * @param  direction  direction number. Range 0 - 7
      * @param  step       translation distance
      */
-    private void occupyPath(int startRow, int startCol, int direction, int step) {
+    private void occupyPath(int targetRow, int targetCol, int direction, int step) {
 
         for (int i = 0; i < step; i++) {
 
             try {
-                int[] position = getTranslatedPosition(startRow, startCol, direction, i);
+                int[] position = getTranslatedPosition(targetRow, targetCol, direction, i);
                 int   row      = position[0];
                 int   col      = position[1];
 
@@ -484,6 +520,130 @@ public class ReversiGame implements Serializable {
             } catch (OutOfBoundsException ex) {
                 // Nothing to do
             }
+        }
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Occupies all available paths that current player has for target location
+     *
+     * @param   targetRow  start position row. 3 for f4 location
+     * @param   targetCol  start position col. 5 for f4 location
+     *
+     * @throws  IllegalMoveException  if move is illegal
+     */
+    private void occupyPaths(int targetRow, int targetCol) throws IllegalMoveException {
+
+        if (availablePaths != null && !availablePaths.isEmpty()) {
+
+            Map<String, List<Path>> playerPaths = availablePaths.get(currentPlayer);
+            List<Path>              foundPaths  = playerPaths.get(convertLocationToText(targetRow, targetCol));
+
+            if (foundPaths != null && !foundPaths.isEmpty()) {
+
+                for (Path foundPath : foundPaths) {
+                    occupyPath(foundPath);
+                }
+
+            } else {
+                throw new IllegalMoveException();
+            }
+        }
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * scans all available paths for all players than updates availablePaths filed.
+     */
+    private void updateAvailablePaths() {
+
+        availablePaths.clear();
+
+        for (int player = 1; player <= 2; player++) {
+
+            Map<String, List<Path>> playerPaths = new HashMap<String, List<Path>>();
+            availablePaths.put(player, playerPaths);
+
+            for (int i = 0; i < 8; i++) {
+
+                for (int j = 0; j < 8; j++) {
+                    List<Path> paths = findAvailablePaths(i, j, player);
+
+                    if (paths != null && paths.size() > 0) {
+                        playerPaths.put(convertLocationToText(i, j), paths);
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    //~ --- [INNER CLASSES] --------------------------------------------------------------------------------------------
+
+    private class Path {
+
+
+
+        //~ --- [INSTANCE FIELDS] --------------------------------------------------------------------------------------
+
+        private int direction;
+        private int step;
+        private int targetCol;
+        private int targetRow;
+
+
+
+        //~ --- [CONSTRUCTORS] -----------------------------------------------------------------------------------------
+
+        private Path(int targetRow, int targetCol, int direction, int step) {
+
+            this.targetRow = targetRow;
+            this.targetCol = targetCol;
+            this.direction = direction;
+            this.step      = step;
+        }
+
+
+
+        //~ --- [METHODS] ----------------------------------------------------------------------------------------------
+
+        private int getDirection() {
+
+            return direction;
+        }
+
+
+
+        //~ ------------------------------------------------------------------------------------------------------------
+
+        private int getStep() {
+
+            return step;
+        }
+
+
+
+        //~ ------------------------------------------------------------------------------------------------------------
+
+        private int getTargetCol() {
+
+            return targetCol;
+        }
+
+
+
+        //~ ------------------------------------------------------------------------------------------------------------
+
+        private int getTargetRow() {
+
+            return targetRow;
         }
     }
 }
