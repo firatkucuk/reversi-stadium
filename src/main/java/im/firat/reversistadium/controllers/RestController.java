@@ -1,16 +1,15 @@
 
 package im.firat.reversistadium.controllers;
 
-import com.google.gson.GsonBuilder;
 import im.firat.reversistadium.exceptions.*;
 import im.firat.reversistadium.game.Game;
 import im.firat.reversistadium.game.ReversiGame;
 import im.firat.reversistadium.game.SingletonGame;
-import im.firat.reversistadium.game.Utils;
 import java.io.IOException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +57,7 @@ public class RestController {
             LOG.info("Game cancelled!");
 
             response.setContentType("application/json");
-            out.print(new GsonBuilder().create().toJson(reversiGame));
+            out.print(new ObjectMapper().writeValueAsString(reversiGame));
         } catch (NotStartedException e) {
             LOG.warn("Cancellation aborted. No active game found!");
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -80,7 +79,7 @@ public class RestController {
             LOG.debug("\n" + game.getReversiGame());
 
             response.setContentType("application/json");
-            out.print(new GsonBuilder().create().toJson(reversiGame));
+            out.print(new ObjectMapper().writeValueAsString(reversiGame));
         } catch (NotStartedException e) {
             LOG.warn("Move aborted. No active game found!");
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -103,7 +102,7 @@ public class RestController {
     public void showGameStatus() throws IOException {
 
         response.setContentType("application/json");
-        out.print(new GsonBuilder().create().toJson(reversiGame));
+        out.print(new ObjectMapper().writeValueAsString(reversiGame));
     }
 
 
@@ -121,7 +120,7 @@ public class RestController {
             LOG.debug("\n" + game.getReversiGame());
 
             response.setContentType("application/json");
-            out.print(new GsonBuilder().create().toJson(game));
+            out.print(new ObjectMapper().writeValueAsString(game));
         } catch (AlreadyStartedException ex) {
             LOG.warn("Game start aborted! There is already a running game.");
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);

@@ -135,11 +135,11 @@ public class Game implements Serializable {
      */
     public void start() throws AlreadyStartedException {
 
+        reversiGame.start();
+
         playerBlackAuthCode = generateAuthCode();
         playerWhiteAuthCode = generateAuthCode();
         cancellationCode    = generateAuthCode() + generateAuthCode();
-
-        reversiGame.start();
     }
 
 

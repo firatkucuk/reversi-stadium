@@ -61,6 +61,76 @@ public class ReversiGameTest {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
+    @SuppressWarnings("unchecked")
+    @Test
+    public void findAvailablePathsTest() throws NoSuchFieldException, NoSuchMethodException, IllegalAccessException,
+        InvocationTargetException {
+
+        /*
+          7  0  1
+           \ | /
+            \|/
+          6--+--2
+            /|\
+           / | \
+          5  4  3
+        */
+
+        Class                  clazz              = ReversiGame.class;
+        Field                  boardStateField    = clazz.getDeclaredField("boardState");
+        Field                  currentPlayerField = clazz.getDeclaredField("currentPlayer");
+        ReversiGame            reversiGame        = new ReversiGame();
+        List<List<Integer>>    boardState;
+        List<ReversiGame.Path> paths;
+
+        // private List<Path> findAvailablePaths(int targetRow, int targetCol, int player);
+        Method method = clazz.getDeclaredMethod("findAvailablePaths", int.class, int.class, int.class);
+
+        boardStateField.setAccessible(true);
+        currentPlayerField.setAccessible(true);
+        method.setAccessible(true);
+        currentPlayerField.set(reversiGame, Constants.BLACK_PLAYER);
+
+        boardState = Arrays.asList(
+
+            //                     0  1  2  3  4  5  6  7
+            //                     a  b  c  d  e  f  g  h
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 1 0
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 2 1
+            Arrays.<Integer>asList(1, 1, 0, 0, 0, 0, 0, 0),     // 3 2
+            Arrays.<Integer>asList(2, 1, 0, 0, 0, 0, 0, 0),     // 4 3
+            Arrays.<Integer>asList(2, 1, 0, 1, 0, 1, 0, 0),     // 5 4
+            Arrays.<Integer>asList(0, 0, 0, 0, 2, 2, 0, 0),     // 6 5
+            Arrays.<Integer>asList(0, 0, 1, 2, 2, 0, 2, 2),     // 7 6
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
+            );
+
+        boardStateField.set(reversiGame, boardState);
+
+
+        paths = (List<ReversiGame.Path>) method.invoke(reversiGame, 2, 0, Constants.BLACK_PLAYER);
+        Assert.assertNull(paths); // Should be null if target location is not null
+
+        paths = (List<ReversiGame.Path>) method.invoke(reversiGame, 0, 5, Constants.BLACK_PLAYER);
+        Assert.assertTrue(paths.isEmpty()); // Should be empty if there's no available path
+
+        paths = (List<ReversiGame.Path>) method.invoke(reversiGame, 1, 0, Constants.BLACK_PLAYER);
+        Assert.assertTrue(paths.isEmpty()); // Should be empty if there's no available path
+
+        paths = (List<ReversiGame.Path>) method.invoke(reversiGame, 5, 1, Constants.BLACK_PLAYER);
+        Assert.assertTrue(paths.isEmpty()); // Should be empty if there's no available path
+
+        paths = (List<ReversiGame.Path>) method.invoke(reversiGame, 5, 0, Constants.BLACK_PLAYER);
+        Assert.assertEquals(paths.size(), 1);
+
+        paths = (List<ReversiGame.Path>) method.invoke(reversiGame, 6, 5, Constants.BLACK_PLAYER);
+        Assert.assertEquals(paths.size(), 3);
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
     @Test
     public void occupyPathTest() throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException,
         InvocationTargetException {
