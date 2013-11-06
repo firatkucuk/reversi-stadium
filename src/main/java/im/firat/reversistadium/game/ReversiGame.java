@@ -105,6 +105,24 @@ public class ReversiGame implements Serializable {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Returns found target locations list
+     *
+     * @return  found target locations list
+     */
+    public Set<String> getAvailableMoves() {
+
+        if (currentPlayer != NO_PLAYER && availablePaths != null && !availablePaths.isEmpty()) {
+            return availablePaths.get(currentPlayer).keySet();
+        }
+
+        return null;
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
     public List<List<Integer>> getBoardState() {
 
         return boardState;
@@ -613,7 +631,7 @@ public class ReversiGame implements Serializable {
 
     //~ --- [INNER CLASSES] --------------------------------------------------------------------------------------------
 
-    private class Path {
+    public static class Path {
 
 
 
