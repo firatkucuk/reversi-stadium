@@ -23,14 +23,14 @@ By default you can create a single game from index page of the application. Type
 You can create a game using ReST API.
 
 ```
-POST http://IP_ADDRESS:PORT/start/
+POST http://IP_ADDRESS:PORT/rest/start/
 ```
 
 `200` status code for succesful game creation. And a json response for additional authentication details about game. Test for game creation:
 
 
 ```
-curl -i -H "Accept: application/json" -X POST http://localhost:8080/reversi-stadium/start
+curl -i -H "Accept: application/json" -X POST http://localhost:8080/reversi-stadium/rest/start
 
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -40,23 +40,7 @@ Server: Jetty(8.1.8.v20121106)
 {
   "cancellationCode": "qxcr2615fxqn6056",
   "playerBlackAuthCode": "gigq9736",
-  "playerWhiteAuthCode": "jeqw5369",
-  "reversiGame": {
-    "boardState":[
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,2,1,0,0,0],
-      [0,0,0,1,2,0,0,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0],
-      [0,0,0,0,0,0,0,0]
-    ],
-    "cancelled": false,
-    "currentPlayer": 1,
-    "started":true,
-    "availableMoves": ["d3","c4","e6","f5"]
-  }
+  "playerWhiteAuthCode": "jeqw5369"
 }
 ```
 
@@ -65,7 +49,7 @@ Server: Jetty(8.1.8.v20121106)
 `400` for already started games.
 
 ```
-curl -i -H "Accept: application/json" -X POST http://localhost:8080/reversi-stadium/start
+curl -i -H "Accept: application/json" -X POST http://localhost:8080/reversi-stadium/rest/start
 
 HTTP/1.1 400 Bad Request
 Date: Wed, 06 Nov 2013 13:50:23 GMT
@@ -109,7 +93,7 @@ Server: Jetty(8.1.8.v20121106)
 `405` for wrong HTTP methods.
 
 ```
-curl -i -H "Accept: application/json" -X GET http://localhost:8080/reversi-stadium/start
+curl -i -H "Accept: application/json" -X GET http://localhost:8080/reversi-stadium/rest/start
 
 HTTP/1.1 405 Method Not Allowed
 Date: Wed, 06 Nov 2013 13:49:33 GMT
@@ -157,13 +141,13 @@ Running Game Cancellation
 
 
 ```
-DELETE http://IP_ADDRESS:PORT/cancel/cancellationCode
+DELETE http://IP_ADDRESS:PORT/rest/cancel/cancellationCode
 ```
 
 `200` game successfully cancelled. Returns JSON status data.
 
 ```
-curl -i -H "Accept: application/json" -X DELETE http://localhost:8080/reversi-stadium/cancel/abcd1234efgh5678
+curl -i -H "Accept: application/json" -X DELETE http://localhost:8080/reversi-stadium/rest/cancel/abcd1234efgh5678
 
 HTTP/1.1 200 OK
 Date: Wed, 06 Nov 2013 13:51:01 GMT
@@ -192,7 +176,7 @@ Server: Jetty(8.1.8.v20121106)
 `403` Wrong cancellation code.
 
 ```
-curl -i -H "Accept: application/json" -X DELETE http://localhost:8080/reversi-stadium/cancel/abcd1234efgh5678
+curl -i -H "Accept: application/json" -X DELETE http://localhost:8080/reversi-stadium/rest/cancel/abcd1234efgh5678
 
 HTTP/1.1 403 Forbidden
 Date: Wed, 06 Nov 2013 13:53:42 GMT
@@ -203,7 +187,7 @@ Server: Jetty(8.1.8.v20121106)
 `404` No active running game.
 
 ```
-curl -i -H "Accept: application/json" -X DELETE http://localhost:8080/reversi-stadium/cancel/abcd1234efgh5678
+curl -i -H "Accept: application/json" -X DELETE http://localhost:8080/reversi-stadium/rest/cancel/abcd1234efgh5678
 
 HTTP/1.1 404 Not Found
 Date: Wed, 06 Nov 2013 13:53:06 GMT
@@ -214,7 +198,7 @@ Server: Jetty(8.1.8.v20121106)
 `405` for wrong HTTP methods.
 
 ```
-curl -i -H "Accept: application/json" -X GET http://localhost:8080/reversi-stadium/cancel/abcd1234efgh5678
+curl -i -H "Accept: application/json" -X GET http://localhost:8080/reversi-stadium/rest/cancel/abcd1234efgh5678
 
 HTTP/1.1 405 Method Not Allowed
 Date: Wed, 06 Nov 2013 14:01:39 GMT
@@ -260,13 +244,13 @@ Moving Pieces
 -------------
 
 ```
-PUT http://IP_ADDRESS:PORT/move/playerAuthenticationCode/location
+PUT http://IP_ADDRESS:PORT/rest/move/playerAuthenticationCode/location
 ```
 
 `200` Piece succesfully moved.
 
 ```
-curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/move/yyei8136/d3
+curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/rest/move/yyei8136/d3
 
 HTTP/1.1 200 OK
 Date: Wed, 06 Nov 2013 13:54:46 GMT
@@ -295,7 +279,7 @@ Server: Jetty(8.1.8.v20121106)
 `400` Illegal move
 
 ```
-curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/move/zood2291/d8
+curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/rest/move/zood2291/d8
 
 HTTP/1.1 400 Bad Request
 Date: Wed, 06 Nov 2013 13:58:53 GMT
@@ -307,7 +291,7 @@ Server: Jetty(8.1.8.v20121106)
 
 
 ```
-curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/move/yyei8136/d3
+curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/rest/move/yyei8136/d3
 
 HTTP/1.1 403 Forbidden
 Date: Wed, 06 Nov 2013 13:58:06 GMT
@@ -320,7 +304,7 @@ Server: Jetty(8.1.8.v20121106)
 
 
 ```
-curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/move/yyei8136/d3
+curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/rest/move/yyei8136/d3
 
 HTTP/1.1 404 Not Found
 Date: Wed, 06 Nov 2013 13:56:52 GMT
@@ -331,7 +315,7 @@ Server: Jetty(8.1.8.v20121106)
 `405` Wrong http method
 
 ```
-curl -i -H "Accept: application/json" -X GET http://localhost:8080/reversi-stadium/move/yyei8136/d3
+curl -i -H "Accept: application/json" -X GET http://localhost:8080/reversi-stadium/rest/move/yyei8136/d3
 
 HTTP/1.1 405 Method Not Allowed
 Date: Wed, 06 Nov 2013 14:00:02 GMT
@@ -376,13 +360,13 @@ Getting Game Status
 -------------------
 
 ```
-GET http://IP_ADDRESS:PORT/status
+GET http://IP_ADDRESS:PORT/rest/status
 ```
 
 `200` Returns json status
 
 ```
-curl -i -H "Accept: application/json" -X GET http://localhost:8080/reversi-stadium/status
+curl -i -H "Accept: application/json" -X GET http://localhost:8080/reversi-stadium/rest/status
 
 HTTP/1.1 200 OK
 Date: Wed, 06 Nov 2013 14:03:41 GMT
@@ -413,7 +397,7 @@ Server: Jetty(8.1.8.v20121106)
 
 
 ```
-curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/status
+curl -i -H "Accept: application/json" -X PUT http://localhost:8080/reversi-stadium/rest/status
 
 HTTP/1.1 405 Method Not Allowed
 Date: Wed, 06 Nov 2013 14:05:02 GMT
