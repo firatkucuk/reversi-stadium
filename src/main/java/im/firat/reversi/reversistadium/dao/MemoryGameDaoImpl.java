@@ -22,7 +22,7 @@ public final class MemoryGameDaoImpl implements GameDao {
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
     @Override
-    public final Game getCurrentGame() {
+    public Game getCurrentGame() {
 
         return SingletonGame.getInstance();
     }

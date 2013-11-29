@@ -83,7 +83,7 @@ public final class Utils {
                 } else if (currentPlaceValue == GameService.WHITE_DISK) {
                     text.append("O ");
                 } else if (currentPlaceValue == GameService.BLACK_DISK) {
-                    text.append("O ");
+                    text.append("X ");
                 }
             }
 

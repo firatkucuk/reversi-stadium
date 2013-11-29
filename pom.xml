@@ -6,9 +6,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <name>reversi-stadium</name>
-  <groupId>fr.firat.reversi</groupId>
+  <groupId>im.firat.reversi</groupId>
   <artifactId>reversi-stadium</artifactId>
-  <version>1.0.1</version>
+  <version>1.1.1</version>
   <packaging>war</packaging>
 
   <properties>
@@ -82,7 +82,7 @@
         <configuration>
           <scanIntervalSeconds>10</scanIntervalSeconds>
           <webApp>
-            <contextPath>/example-jaxrs-webapp</contextPath>
+            <contextPath>/reversi-stadium</contextPath>
           </webApp>
         </configuration>
       </plugin>

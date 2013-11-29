@@ -50,7 +50,7 @@ public final class GameController {
     @DELETE
     @Path("/cancel/{cancellationCode}")
     @Produces("application/json")
-    public final Game cancel(@PathParam("cancellationCode") final String cancellationCode) {
+    public Game cancel(@PathParam("cancellationCode") final String cancellationCode) {
 
         try {
 
@@ -76,7 +76,7 @@ public final class GameController {
     @PUT
     @Path("/move/{authCode}/{piece}")
     @Produces("application/json")
-    public final Game move(@PathParam("authCode") final String authCode,
+    public Game move(@PathParam("authCode") final String authCode,
             @PathParam("piece") final String piece) {
 
         try {
@@ -112,7 +112,7 @@ public final class GameController {
     @POST
     @Path("/start")
     @Produces("application/json")
-    public final Authorization start() {
+    public Authorization start() {
 
         try {
             authorizationRepository.start();
@@ -142,7 +142,7 @@ public final class GameController {
     @GET
     @Path("/status")
     @Produces("application/json")
-    public final Game status() {
+    public Game status() {
 
         return gameRepository.status();
     }

@@ -41,7 +41,7 @@ public final class GameRepository {
      *
      * @throws  NotStartedException  If there is no running status
      */
-    public final void cancel() throws NotStartedException {
+    public void cancel() throws NotStartedException {
 
         final Game        game        = gameDao.getCurrentGame();
         final GameService gameService = new GameService();
@@ -62,7 +62,7 @@ public final class GameRepository {
      * @throws  NotStartedException   if status is not started
      * @throws  IllegalMoveException  if actual move is illegal
      */
-    public final void move(final String piece, final int player) throws NotStartedException, IllegalMoveException,
+    public void move(final String piece, final int player) throws NotStartedException, IllegalMoveException,
         WrongOrderException {
 
         final Game        game        = gameDao.getCurrentGame();
@@ -76,7 +76,7 @@ public final class GameRepository {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public final void persist(Game game) {
+    public void persist(Game game) {
 
         gameDao.persist(game);
     }
@@ -90,7 +90,7 @@ public final class GameRepository {
      *
      * @throws  AlreadyStartedException  if status is already started
      */
-    public final void start() throws AlreadyStartedException {
+    public void start() throws AlreadyStartedException {
 
         final Game        game        = gameDao.getCurrentGame();
         final GameService gameService = new GameService();
@@ -108,7 +108,7 @@ public final class GameRepository {
      *
      * @return  returns game status
      */
-    public final Game status() {
+    public Game status() {
 
         return gameDao.getCurrentGame();
     }

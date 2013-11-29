@@ -35,7 +35,7 @@ public final class GameTest {
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
     @Test
-    public final void convertLocationToTextTest() throws NoSuchMethodException, InvocationTargetException,
+    public void convertLocationToTextTest() throws NoSuchMethodException, InvocationTargetException,
         IllegalAccessException {
 
         final Method method = GameService.class.getDeclaredMethod(
@@ -73,7 +73,7 @@ public final class GameTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public final void findAvailablePathsTest() {
+    public void findAvailablePathsTest() {
 
         /*
           7  0  1
@@ -130,7 +130,7 @@ public final class GameTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public final void occupyPathTest() throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException,
+    public void occupyPathTest() throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException,
         InvocationTargetException {
 
         /*
@@ -466,8 +466,8 @@ public final class GameTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public final void sampleGameScenarioTest() throws AlreadyStartedException, WrongOrderException,
-        IllegalMoveException, NotStartedException {
+    public void sampleGameScenarioTest() throws AlreadyStartedException, WrongOrderException, IllegalMoveException,
+        NotStartedException {
 
         final GameService gameService = new GameService();
         final Game        game        = new Game();
