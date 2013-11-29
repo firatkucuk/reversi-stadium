@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -92,7 +93,7 @@ public final class GameTest {
                 Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)  // 8 7
                 ));
 
-        List<Path> paths;
+        Map<String, List<Path>> paths;
 
         paths = gameService.findAvailablePaths(game, 2, 0, BLACK_PLAYER);
         Assert.assertNull(paths); // Should be null if target location is not null
@@ -107,10 +108,10 @@ public final class GameTest {
         Assert.assertTrue(paths.isEmpty()); // Should be empty if there's no available path
 
         paths = gameService.findAvailablePaths(game, 5, 0, BLACK_PLAYER);
-        Assert.assertEquals(paths.size(), 1);
+        Assert.assertEquals(paths.get(convertLocationToText(5, 0)).size(), 1);
 
         paths = gameService.findAvailablePaths(game, 6, 5, BLACK_PLAYER);
-        Assert.assertEquals(paths.size(), 3);
+        Assert.assertEquals(paths.get(convertLocationToText(6, 5)).size(), 3);
     }
 
 
