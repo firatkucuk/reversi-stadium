@@ -38,32 +38,21 @@ public final class GameTest {
     public void convertLocationToTextTest() throws NoSuchMethodException, InvocationTargetException,
         IllegalAccessException {
 
-        final Method method = GameService.class.getDeclaredMethod(
-            "convertLocationToText", // method name
-            int.class,     // parameter - row
-            int.class      // parameter - col
-        );
-
-        // Making private method accessible for test
-        method.setAccessible(true);
-
-        final GameService gameService = new GameService();
-
         String cell;
 
-        cell = (String) method.invoke(gameService, 0, 0);
+        cell = GameService.convertLocationToText(0, 0);
         Assert.assertEquals(cell, "a1");
 
-        cell = (String) method.invoke(gameService, 0, 7);
+        cell = GameService.convertLocationToText(0, 7);
         Assert.assertEquals(cell, "h1");
 
-        cell = (String) method.invoke(gameService, 7, 0);
+        cell = GameService.convertLocationToText(7, 0);
         Assert.assertEquals(cell, "a8");
 
-        cell = (String) method.invoke(gameService, 7, 7);
+        cell = GameService.convertLocationToText(7, 7);
         Assert.assertEquals(cell, "h8");
 
-        cell = (String) method.invoke(gameService, 3, 3);
+        cell = GameService.convertLocationToText(3, 3);
         Assert.assertEquals(cell, "d4");
     }
 

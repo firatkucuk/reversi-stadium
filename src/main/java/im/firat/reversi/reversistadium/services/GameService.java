@@ -44,6 +44,86 @@ public final class GameService {
 
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
+    /**
+     * Converts given location (row, col) to human readable board text
+     *
+     * @param   row  row value of given location
+     * @param   col  column value of given location
+     *
+     * @return  returns human readable location text. Converts (1, 7) to h2
+     */
+    public static String convertLocationToText(final int row, final int col) {
+
+        final StringBuilder text = new StringBuilder();
+
+        text.append(BOARD_CHARS[col]);
+        text.append(row + 1);
+
+        return text.toString();
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Returns translated position for required direction. If direction is other than range 0 - 7 then returns base
+     * location.
+     *
+     * <pre>
+             c   d   e   f
+         4  [2] [0] [0] [1]  >>> direction 2
+     * </pre>
+     *
+     * If start position is c4 and step is 3 then target location is f4. Returns [3, 5]
+     *
+     * @param   targetRow  start position row. 3 for f4 location
+     * @param   targetCol  start position col. 5 for f4 location
+     * @param   direction  direction number. Range 0 - 7
+     * @param   step       translation distance
+     *
+     * @return  returns translated position index 0 is row, index 1 is col
+     *
+     * @throws  OutOfBoundsException
+     */
+    public static int[] getTranslatedPosition(final int targetRow, final int targetCol, final int direction,
+            final int step) throws OutOfBoundsException {
+
+        int row = targetRow, col = targetCol;
+
+        if (direction == 0) {
+            row = targetRow - step;
+        } else if (direction == 1) {
+            row = targetRow - step;
+            col = targetCol + step;
+        } else if (direction == 2) {
+            col = targetCol + step;
+        } else if (direction == 3) {
+            row = targetRow + step;
+            col = targetCol + step;
+        } else if (direction == 4) {
+            row = targetRow + step;
+        } else if (direction == 5) {
+            row = targetRow + step;
+            col = targetCol - step;
+        } else if (direction == 6) {
+            col = targetCol - step;
+        } else if (direction == 7) {
+            row = targetRow - step;
+            col = targetCol - step;
+        }
+
+        if (row < 0 || col < 0 || row > 7 || col > 7) {
+            throw new OutOfBoundsException();
+        }
+
+        return new int[] { row, col };
+    }
+
+
+
+    //~ --- [METHODS] --------------------------------------------------------------------------------------------------
+
     public void cancel(final Game game) throws NotStartedException {
 
         if (!game.isStarted()) {
@@ -374,85 +454,5 @@ public final class GameService {
         }
 
         game.setAvailablePaths(availablePaths);
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Converts given location (row, col) to human readable board text
-     *
-     * @param   row  row value of given location
-     * @param   col  column value of given location
-     *
-     * @return  returns human readable location text. Converts (1, 7) to h2
-     */
-    private String convertLocationToText(final int row, final int col) {
-
-        final StringBuilder text = new StringBuilder();
-
-        text.append(BOARD_CHARS[col]);
-        text.append(row + 1);
-
-        return text.toString();
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * Returns translated position for required direction. If direction is other than range 0 - 7 then returns base
-     * location.
-     *
-     * <pre>
-             c   d   e   f
-         4  [2] [0] [0] [1]  >>> direction 2
-     * </pre>
-     *
-     * If start position is c4 and step is 3 then target location is f4. Returns [3, 5]
-     *
-     * @param   targetRow  start position row. 3 for f4 location
-     * @param   targetCol  start position col. 5 for f4 location
-     * @param   direction  direction number. Range 0 - 7
-     * @param   step       translation distance
-     *
-     * @return  returns translated position index 0 is row, index 1 is col
-     *
-     * @throws  OutOfBoundsException
-     */
-    private int[] getTranslatedPosition(final int targetRow, final int targetCol, final int direction, final int step)
-        throws OutOfBoundsException {
-
-        int row = targetRow, col = targetCol;
-
-        if (direction == 0) {
-            row = targetRow - step;
-        } else if (direction == 1) {
-            row = targetRow - step;
-            col = targetCol + step;
-        } else if (direction == 2) {
-            col = targetCol + step;
-        } else if (direction == 3) {
-            row = targetRow + step;
-            col = targetCol + step;
-        } else if (direction == 4) {
-            row = targetRow + step;
-        } else if (direction == 5) {
-            row = targetRow + step;
-            col = targetCol - step;
-        } else if (direction == 6) {
-            col = targetCol - step;
-        } else if (direction == 7) {
-            row = targetRow - step;
-            col = targetCol - step;
-        }
-
-        if (row < 0 || col < 0 || row > 7 || col > 7) {
-            throw new OutOfBoundsException();
-        }
-
-        return new int[] { row, col };
     }
 }
