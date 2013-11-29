@@ -7,25 +7,25 @@
   <head>
     <title>Reversi Stadium</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <script type="text/javascript" src="${requestScope['contextPath']}/public/javascripts/jquery-2.0.3.min.js"></script>
-    <script type="text/javascript" src="${requestScope['contextPath']}/public/javascripts/reversi-stadium.js"></script>
-    <script type="text/javascript" src="${requestScope['contextPath']}/public/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
-    <link type="text/css" rel="stylesheet" href="${requestScope['contextPath']}/public/stylesheets/reversi-stadium.css" />
-    <link type="text/css" rel="stylesheet" href="${requestScope['contextPath']}/public/stylesheets/ui-lightness/jquery-ui-1.10.3.custom.min.css" />
+    <script type="text/javascript" src="${pageContext.request.contextPath}/public/javascripts/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript" src="${pageContext.request.contextPath}/public/javascripts/reversi-stadium.js"></script>
+    <script type="text/javascript" src="${pageContext.request.contextPath}/public/javascripts/jquery-ui-1.10.3.custom.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/public/stylesheets/reversi-stadium.css" />
+    <link type="text/css" rel="stylesheet" href="${pageContext.request.contextPath}/public/stylesheets/ui-lightness/jquery-ui-1.10.3.custom.min.css" />
     <script type="text/javascript">
       $(document).ready(function() {
-          updateView('${requestScope['contextPath']}');
+          updateView('${pageContext.request.contextPath}');
 
           setInterval(
             function() {
-              updateView('${requestScope['contextPath']}');
+              updateView('${pageContext.request.contextPath}');
             },
-            5000
+            500
           );
       });
     </script>
   </head>
-  <body>     
+  <body>
     <div id="main_container">
       <h1>Reversi Stadium</h1>
       <br />

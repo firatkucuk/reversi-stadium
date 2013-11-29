@@ -7,7 +7,7 @@
     </layout>
   </appender>
 
-  <logger name="im.firat.reversistadium" level="debug"/>
+  <logger name="im.firat.reversi.reversistadium" level="debug"/>
 
   <root level="warn">
     <appender-ref ref="STDOUT" />

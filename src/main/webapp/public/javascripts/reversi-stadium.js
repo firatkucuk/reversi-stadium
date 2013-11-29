@@ -8,7 +8,7 @@ function showGameStartForm(contextPath, started) {
   if (gameStarted == -1 || gameStarted != started) {
     var text = '';
   
-    text += '<form id="game_start_form" onsubmit="return startGame(\'' + contextPath + '\');">';
+    text += '<form id="game_start_form" onsubmit="return start(\'' + contextPath + '\');">';
     text += '  <div><input type="submit" class="button" value="Start a New Game" /></div>';
     text += '</form>';
   
@@ -26,12 +26,12 @@ function showGameCancelForm(contextPath, started) {
   if (gameStarted == -1 || gameStarted != started) {
     var text = '';
 
-    text += '<form id="game_cancel_form" onsubmit="return cancelGame(\'' + contextPath + '\');">';
+    text += '<form id="game_cancel_form" onsubmit="return cancel(\'' + contextPath + '\');">';
     text += '  <div class="frame"><div class="label">Cancellation Code</div><div class="input"><input id="cancellation_code" class="ui-widget ui-state-default" type="text" value="" /></div></div>';
     text += '  <div style="margin-top: 20px;"><input type="submit" class="button" value="Cancel Running Game" /></div>';
     text += '</form>';
     text += '<br /><br />';
-    text += '<form id="piece_move_form" onsubmit="return movePiece(\'' + contextPath + '\');">';
+    text += '<form id="piece_move_form" onsubmit="return move(\'' + contextPath + '\');">';
     text += '  <div class="frame"><div class="label">Player Code</div><div class="input"><input id="player_code" class="ui-widget ui-state-default" type="text" value="" /></div></div>';
     text += '  <div class="frame"><div class="label">Move Place</div><div class="input"><input id="move_place" class="ui-widget ui-state-default" type="text" value="" /></div></div>';
     text += '  <div style="margin-top: 20px;"><input type="submit" class="button" value="Move Piece" /></div>';
@@ -49,7 +49,7 @@ function showGameCancelForm(contextPath, started) {
 function updateView(contextPath) {
 
   $.ajax({
-      url       : contextPath + "/status",
+      url       : contextPath + "/rest/status",
       success   : function(data, textStatus, jqXHR) {
         var started       = data['started'];
         var cancelled     = data['cancelled'];
@@ -103,10 +103,10 @@ function updateView(contextPath) {
 
 //~ --------------------------------------------------------------------------------------------------------------------
 
-function startGame(contextPath) {
+function start(contextPath) {
   
   $.ajax({
-      url       : contextPath + "/start",
+      url       : contextPath + "/rest/start",
       method    : "POST",
       statusCode: {
         400: function() {
@@ -134,7 +134,7 @@ function startGame(contextPath) {
 
 //~ --------------------------------------------------------------------------------------------------------------------
 
-function cancelGame(contextPath) {
+function cancel(contextPath) {
 
   var cancellationCode = $('#cancellation_code').val();
   
@@ -142,11 +142,11 @@ function cancelGame(contextPath) {
     alert('Cancellation code is required!');
   } else {
     $.ajax({
-          url       : contextPath + "/cancel/" + cancellationCode,
+          url       : contextPath + "/rest/cancel/" + cancellationCode,
           method    : "DELETE",
           statusCode: {
             404: function() {
-              alert("No active game play!");
+              alert("No active status play!");
             },
             403: function() {
               alert("Wrong cancellation code!");
@@ -164,7 +164,7 @@ function cancelGame(contextPath) {
 
 //~ --------------------------------------------------------------------------------------------------------------------
 
-function movePiece(contextPath) {
+function move(contextPath) {
 
   var playerCode = $('#player_code').val();
   var movePlace  = $('#move_place').val();
@@ -175,11 +175,11 @@ function movePiece(contextPath) {
     alert('Move place is required and should be in desired format!');
   } else {
     $.ajax({
-          url       : contextPath + "/move/" + playerCode + "/" + movePlace,
+          url       : contextPath + "/rest/move/" + playerCode + "/" + movePlace,
           method    : "PUT",
           statusCode: {
             404: function() {
-              alert("No active game play!");
+              alert("No active status play!");
             },
             403: function() {
               alert("Wrong player code or wrong player order!");
