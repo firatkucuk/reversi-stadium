@@ -25,33 +25,11 @@ public class Game implements Serializable {
 
     //~ --- [INSTANCE FIELDS] ------------------------------------------------------------------------------------------
 
-    /**
-     * <pre>
-        {
-           1: { // Found paths for black player
-              'e1': { // Path Object
-                'targetRow': 0,
-                'targetCol': 4,
-                'direction': 0,
-                'step'     : 2
-              }
-           },
-           2: { // Found paths for white player
-              'a5': { // Path Object
-                'targetRow': 4,
-                'targetCol': 0,
-                'direction': 6,
-                'step'     : 2
-              }
-           }
-        }
-     * </pre>
-     */
-    private Map<Integer, Map<String, List<Path>>> availablePaths;
-    private List<List<Integer>>                   boardState;
-    private boolean                               cancelled;
-    private int                                   currentPlayer;
-    private boolean                               started;
+    private Set<String>         availableMoves;
+    private List<List<Integer>> boardState;
+    private boolean             cancelled;
+    private int                 currentPlayer;
+    private boolean             started;
 
 
 
@@ -67,21 +45,7 @@ public class Game implements Serializable {
 
     public Set<String> getAvailableMoves() {
 
-        if (currentPlayer != GameService.NO_PLAYER && availablePaths != null && !availablePaths.isEmpty()) {
-            return availablePaths.get(currentPlayer).keySet();
-        }
-
-        return null;
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    @JsonIgnore
-    public Map<Integer, Map<String, List<Path>>> getAvailablePaths() {
-
-        return availablePaths;
+        return availableMoves;
     }
 
 
@@ -124,9 +88,9 @@ public class Game implements Serializable {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public void setAvailablePaths(Map<Integer, Map<String, List<Path>>> availablePaths) {
+    public void setAvailableMoves(Set<String> availableMoves) {
 
-        this.availablePaths = availablePaths;
+        this.availableMoves = availableMoves;
     }
 
 

@@ -28,9 +28,30 @@ public final class GameService {
     public static final int WHITE_PLAYER = 2;
 
     // In class global constants
-    private static final String BOARD_LETTERS = "abcdefgh";
-    private static final String BOARD_NUMBERS = "12345678";
-    private static final char[] BOARD_CHARS   = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+    private static final String              BOARD_LETTERS           = "abcdefgh";
+    private static final String              BOARD_NUMBERS           = "12345678";
+    private static final char[]              BOARD_CHARS             = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+    private static final Set<String>         INITIAL_AVAILABLE_MOVES;
+    private static final List<List<Integer>> INITIAL_BOARD_STATE;
+
+
+
+    static {
+        INITIAL_AVAILABLE_MOVES = new HashSet<String>(Arrays.asList("c4", "d3", "e6", "f5"));
+        INITIAL_BOARD_STATE     = Arrays.asList(
+
+            //                     0  1  2  3  4  5  6  7
+            //                     a  b  c  d  e  f  g  h
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 1 0
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 2 1
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 3 2
+            Arrays.<Integer>asList(0, 0, 0, 2, 1, 0, 0, 0),     // 4 3
+            Arrays.<Integer>asList(0, 0, 0, 1, 2, 0, 0, 0),     // 5 4
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 6 5
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7 6
+            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
+            );
+    }
 
 
 
@@ -132,7 +153,29 @@ public final class GameService {
 
         game.setStarted(false);
         game.setCancelled(true);
-        game.setAvailablePaths(null);
+        game.setAvailableMoves(null);
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
+    public Map<String, List<Path>> findAllAvailablePaths(final Game game, final int player) {
+
+        final Map<String, List<Path>> playerPaths = new HashMap<String, List<Path>>();
+
+        for (int row = 0; row < 8; row++) {
+
+            for (int col = 0; col < 8; col++) {
+                Map<String, List<Path>> availablePaths = findAvailablePaths(game, row, col, player);
+
+                if (availablePaths != null && !availablePaths.isEmpty()) {
+                    playerPaths.putAll(availablePaths);
+                }
+            }
+        }
+
+        return playerPaths;
     }
 
 
@@ -160,7 +203,8 @@ public final class GameService {
      *
      * @return  Returns found path if valid pattern found.
      */
-    public List<Path> findAvailablePaths(final Game game, final int targetRow, final int targetCol, final int player) {
+    public Map<String, List<Path>> findAvailablePaths(final Game game, final int targetRow, final int targetCol,
+            final int player) {
 
         final List<List<Integer>> boardState = game.getBoardState();
 
@@ -168,10 +212,9 @@ public final class GameService {
             return null;
         }
 
-        List<Path> result = new ArrayList<Path>();
-
-        final int DIFFERENT_COLOR = player == WHITE_PLAYER ? BLACK_DISK : WHITE_DISK;
-        final int SAME_COLOR      = player; // Redundant constant for code readability
+        final Map<String, List<Path>> playerPaths     = new HashMap<String, List<Path>>();
+        final int                     DIFFERENT_COLOR = player == WHITE_PLAYER ? BLACK_DISK : WHITE_DISK;
+        final int                     SAME_COLOR      = player; // Redundant constant for code readability
 
         for (int direction = 0; direction < 8; direction++) {
 
@@ -186,7 +229,15 @@ public final class GameService {
                     if (value == END_OF_DIRECTION || value == EMPTY_PLACE) {
                         break;
                     } else if (value == SAME_COLOR) {
-                        result.add(new Path(targetRow, targetCol, direction, step));
+                        String     position = convertLocationToText(targetRow, targetCol);
+                        List<Path> paths    = playerPaths.get(position);
+
+                        if (paths == null) {
+                            paths = new ArrayList<Path>();
+                        }
+
+                        paths.add(new Path(targetRow, targetCol, direction, step));
+                        playerPaths.put(position, paths);
 
                         break;
                     }
@@ -194,7 +245,7 @@ public final class GameService {
             }
         }         // end for
 
-        return result;
+        return playerPaths;
     }
 
 
@@ -237,25 +288,6 @@ public final class GameService {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    /**
-     * Checks if there are legal moves for player
-     *
-     * @param   player  1 for black, 2 for white
-     *
-     * @return  returns true if there is at lease one legal move
-     */
-    public boolean haveLegalMovesForPlayer(final Game game, final int player) {
-
-        final Map<Integer, Map<String, List<Path>>> availablePaths = game.getAvailablePaths();
-        final Map<String, List<Path>>               playerPaths    = availablePaths.get(player);
-
-        return !playerPaths.isEmpty();
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
     public void move(final Game game, final String piece, final int player) throws NotStartedException,
         WrongOrderException, IllegalMoveException {
 
@@ -273,17 +305,25 @@ public final class GameService {
         final int    col   = BOARD_LETTERS.indexOf(chars[0]);
         final int    row   = BOARD_NUMBERS.indexOf(chars[1]);
 
-        occupyPaths(game, row, col);
-        updateAvailablePaths(game);
+        Map<String, List<Path>> playerPaths = findAvailablePaths(game, row, col, currentPlayer);
+
+        occupyPaths(game, playerPaths, row, col);
 
         final int otherPlayer = currentPlayer == BLACK_PLAYER ? WHITE_PLAYER : BLACK_PLAYER;
 
-        if (haveLegalMovesForPlayer(game, otherPlayer)) {
+        if (!(playerPaths = findAllAvailablePaths(game, otherPlayer)).isEmpty()) {
+
+            // if have legal moves for other player
             game.setCurrentPlayer(otherPlayer);
-        } else if (!haveLegalMovesForPlayer(game, currentPlayer)) {
+            game.setAvailableMoves(playerPaths.keySet());
+        } else if (!(playerPaths = findAllAvailablePaths(game, currentPlayer)).isEmpty()) {
+
+            // if have legal moves for current player
+            game.setAvailableMoves(playerPaths.keySet());
+        } else {
             game.setStarted(false);
             game.setCurrentPlayer(NO_PLAYER);
-            game.setAvailablePaths(null);
+            game.setAvailableMoves(null);
         }
     }
 
@@ -363,30 +403,18 @@ public final class GameService {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    /**
-     * Occupies all available paths that current player has for target location
-     *
-     * @param   targetRow  start position row. 3 for f4 location
-     * @param   targetCol  start position col. 5 for f4 location
-     *
-     * @throws  IllegalMoveException  if move is illegal
-     */
-    public void occupyPaths(final Game game, final int targetRow, final int targetCol) throws IllegalMoveException {
+    public void occupyPaths(final Game game, final Map<String, List<Path>> playerPaths, final int targetRow,
+            final int targetCol) throws IllegalMoveException {
 
-        final Map<Integer, Map<String, List<Path>>> availablePaths = game.getAvailablePaths();
-        final int                                   currentPlayer  = game.getCurrentPlayer();
+        if (playerPaths != null && !playerPaths.isEmpty()) {
 
-        if (availablePaths != null && !availablePaths.isEmpty()) {
-
-            final Map<String, List<Path>> playerPaths = availablePaths.get(currentPlayer);
-            final List<Path>              foundPaths  = playerPaths.get(convertLocationToText(targetRow, targetCol));
+            final List<Path> foundPaths = playerPaths.get(convertLocationToText(targetRow, targetCol));
 
             if (foundPaths != null && !foundPaths.isEmpty()) {
 
                 for (Path foundPath : foundPaths) {
                     occupyPath(game, foundPath);
                 }
-
             } else {
                 throw new IllegalMoveException();
             }
@@ -397,7 +425,6 @@ public final class GameService {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
     public void start(Game game) throws AlreadyStartedException {
 
         if (game.isStarted()) {
@@ -407,52 +434,7 @@ public final class GameService {
         game.setStarted(true);
         game.setCancelled(false);
         game.setCurrentPlayer(BLACK_PLAYER);
-        game.setBoardState(Arrays.<List<Integer>>asList(
-
-                //                     0  1  2  3  4  5  6  7
-                //                     a  b  c  d  e  f  g  h
-                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0), // 1 0
-                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0), // 2 1
-                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0), // 3 2
-                Arrays.<Integer>asList(0, 0, 0, 2, 1, 0, 0, 0), // 4 3
-                Arrays.<Integer>asList(0, 0, 0, 1, 2, 0, 0, 0), // 5 4
-                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0), // 6 5
-                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0), // 7 6
-                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)  // 8 7
-                ));
-
-        updateAvailablePaths(game);
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    /**
-     * scans all available paths for all players than updates availablePaths filed.
-     */
-    public void updateAvailablePaths(final Game game) {
-
-        final HashMap<Integer, Map<String, List<Path>>> availablePaths;
-        availablePaths = new HashMap<Integer, Map<String, List<Path>>>(2);
-
-        for (int player = 1; player <= 2; player++) {
-
-            final Map<String, List<Path>> playerPaths = new HashMap<String, List<Path>>();
-            availablePaths.put(player, playerPaths);
-
-            for (int row = 0; row < 8; row++) {
-
-                for (int col = 0; col < 8; col++) {
-                    final List<Path> paths = findAvailablePaths(game, row, col, player);
-
-                    if (paths != null && paths.size() > 0) {
-                        playerPaths.put(convertLocationToText(row, col), paths);
-                    }
-                }
-            }
-        }
-
-        game.setAvailablePaths(availablePaths);
+        game.setBoardState(INITIAL_BOARD_STATE);
+        game.setAvailableMoves(INITIAL_AVAILABLE_MOVES);
     }
 }
