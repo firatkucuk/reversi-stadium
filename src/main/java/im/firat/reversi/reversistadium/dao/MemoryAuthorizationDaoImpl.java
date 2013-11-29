@@ -22,7 +22,7 @@ public final class MemoryAuthorizationDaoImpl implements AuthorizationDao {
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
     @Override
-    public final Authorization getCurrentGameAuthorization() {
+    public Authorization getCurrentGameAuthorization() {
 
         return SingletonAuthorization.getInstance();
     }

@@ -34,7 +34,7 @@ public final class AuthorizationRepository {
 
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
-    public final void cancel(final String cancellationCode) throws WrongCodeException {
+    public void cancel(final String cancellationCode) throws WrongCodeException {
 
         final Authorization authorizationInfo = authorizationInfoDao.getCurrentGameAuthorization();
 
@@ -47,7 +47,7 @@ public final class AuthorizationRepository {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public final Authorization get() {
+    public Authorization get() {
 
         return authorizationInfoDao.getCurrentGameAuthorization();
     }
@@ -56,7 +56,7 @@ public final class AuthorizationRepository {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public final int move(final String authCode) throws WrongCodeException {
+    public int move(final String authCode) throws WrongCodeException {
 
         final Authorization authorizationInfo = authorizationInfoDao.getCurrentGameAuthorization();
 
@@ -73,7 +73,7 @@ public final class AuthorizationRepository {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public final void start() {
+    public void start() {
 
         final Authorization authorizationInfo = authorizationInfoDao.getCurrentGameAuthorization();
 

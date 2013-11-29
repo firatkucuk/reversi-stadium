@@ -9,7 +9,7 @@ import java.util.*;
 
 
 
-public class GameService {
+public final class GameService {
 
 
 
