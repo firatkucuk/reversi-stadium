@@ -1,8 +1,8 @@
 
-package im.firat.reversistadium.exceptions;
+package im.firat.reversi.reversistadium.exceptions;
 
 
-public class AlreadyStartedException extends Throwable {
+public final class AlreadyStartedException extends Throwable {
 
 
 

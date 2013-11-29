@@ -1,23 +1,21 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
-		  http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
-         version="3.0">
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
-  <filter>
-    <filter-name>DispatcherFilter</filter-name>
-    <filter-class>im.firat.reversistadium.filters.DispatcherFilter</filter-class>
-  </filter>
-  
-  <filter-mapping>
-    <filter-name>DispatcherFilter</filter-name>
-    <url-pattern>/</url-pattern>
-    <url-pattern>/status</url-pattern>
-    <url-pattern>/status/</url-pattern>
-    <url-pattern>/start/</url-pattern>
-    <url-pattern>/start/</url-pattern>
-    <url-pattern>/cancel/*</url-pattern>
-    <url-pattern>/move/*</url-pattern>
-  </filter-mapping>
+  <display-name>Reversi Stadium Web Application</display-name>
+
+  <servlet>
+    <servlet-name>reversi-stadium-app</servlet-name>
+    <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+    <init-param>
+      <param-name>javax.ws.rs.Application</param-name>
+      <param-value>im.firat.reversi.reversistadium.ReversiStadiumApp</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>reversi-stadium-app</servlet-name>
+    <url-pattern>/rest/*</url-pattern>
+  </servlet-mapping>
 </web-app>

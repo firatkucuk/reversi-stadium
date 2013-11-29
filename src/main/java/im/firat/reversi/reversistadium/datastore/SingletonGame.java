@@ -1,12 +1,15 @@
 
-package im.firat.reversistadium.game;
+package im.firat.reversi.reversistadium.datastore;
+
+
+import im.firat.reversi.reversistadium.domain.Game;
+
 
 
 /**
- * Reversi-Stadium supports one game instance at one time. This class adds singleton access to Game and Reversi Game
- * classes.
+ * Reversi-Stadium supports one game instance at a time. This class provides singleton access to Game domain object
  */
-public class SingletonGame {
+public final class SingletonGame {
 
 
 
