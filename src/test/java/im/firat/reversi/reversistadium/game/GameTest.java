@@ -1,23 +1,22 @@
 
 package im.firat.reversi.reversistadium.game;
 
-import im.firat.reversi.reversistadium.beans.Path;
-import im.firat.reversi.reversistadium.domain.Game;
-import im.firat.reversi.reversistadium.exceptions.AlreadyStartedException;
-import im.firat.reversi.reversistadium.exceptions.IllegalMoveException;
-import im.firat.reversi.reversistadium.exceptions.NotStartedException;
-import im.firat.reversi.reversistadium.exceptions.WrongOrderException;
-import im.firat.reversi.reversistadium.repositories.GameRepository;
-import im.firat.reversi.reversistadium.services.GameService;
+import im.firat.reversi.beans.Path;
+import im.firat.reversi.beans.Position;
+import im.firat.reversi.domain.Game;
+import im.firat.reversi.exceptions.AlreadyStartedException;
+import im.firat.reversi.exceptions.IllegalMoveException;
+import im.firat.reversi.exceptions.NotStartedException;
+import im.firat.reversi.exceptions.WrongOrderException;
+import im.firat.reversi.services.GameService;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static im.firat.reversi.reversistadium.services.GameService.*;
+import static im.firat.reversi.services.GameService.*;
 
 
 
@@ -34,32 +33,6 @@ public final class GameTest {
 
 
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
-
-    @Test
-    public void convertLocationToTextTest() throws NoSuchMethodException, InvocationTargetException,
-        IllegalAccessException {
-
-        String cell;
-
-        cell = GameService.convertLocationToText(0, 0);
-        Assert.assertEquals(cell, "a1");
-
-        cell = GameService.convertLocationToText(0, 7);
-        Assert.assertEquals(cell, "h1");
-
-        cell = GameService.convertLocationToText(7, 0);
-        Assert.assertEquals(cell, "a8");
-
-        cell = GameService.convertLocationToText(7, 7);
-        Assert.assertEquals(cell, "h8");
-
-        cell = GameService.convertLocationToText(3, 3);
-        Assert.assertEquals(cell, "d4");
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
 
     @SuppressWarnings("unchecked")
     @Test
@@ -93,25 +66,38 @@ public final class GameTest {
                 Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)  // 8 7
                 ));
 
-        Map<String, List<Path>> paths;
+        Map<Position, List<Path>> paths;
+        Position                  position;
 
-        paths = gameService.findAvailablePaths(game, 2, 0, BLACK_PLAYER);
+        position = new Position(2, 0);
+        paths    = gameService.findAvailablePaths(game, position, BLACK_PLAYER);
+
         Assert.assertNull(paths); // Should be null if target location is not null
 
-        paths = gameService.findAvailablePaths(game, 0, 5, BLACK_PLAYER);
+        position = new Position(0, 5);
+        paths    = gameService.findAvailablePaths(game, position, BLACK_PLAYER);
+
         Assert.assertTrue(paths.isEmpty()); // Should be empty if there's no available path
 
-        paths = gameService.findAvailablePaths(game, 1, 0, BLACK_PLAYER);
+        position = new Position(1, 0);
+        paths    = gameService.findAvailablePaths(game, position, BLACK_PLAYER);
+
         Assert.assertTrue(paths.isEmpty()); // Should be empty if there's no available path
 
-        paths = gameService.findAvailablePaths(game, 5, 1, BLACK_PLAYER);
+        position = new Position(5, 1);
+        paths    = gameService.findAvailablePaths(game, position, BLACK_PLAYER);
+
         Assert.assertTrue(paths.isEmpty()); // Should be empty if there's no available path
 
-        paths = gameService.findAvailablePaths(game, 5, 0, BLACK_PLAYER);
-        Assert.assertEquals(paths.get(convertLocationToText(5, 0)).size(), 1);
+        position = new Position(5, 0);
+        paths    = gameService.findAvailablePaths(game, position, BLACK_PLAYER);
 
-        paths = gameService.findAvailablePaths(game, 6, 5, BLACK_PLAYER);
-        Assert.assertEquals(paths.get(convertLocationToText(6, 5)).size(), 3);
+        Assert.assertEquals(paths.get(position).size(), 1);
+
+        position = new Position(6, 5);
+        paths    = gameService.findAvailablePaths(game, position, BLACK_PLAYER);
+
+        Assert.assertEquals(paths.get(position).size(), 3);
     }
 
 
@@ -142,6 +128,9 @@ public final class GameTest {
 
         List<List<Integer>> boardState;
         List<List<Integer>> targetBoardState;
+        Position            targetPosition;
+        int                 direction;
+        int                 step;
 
         // Direction 0 Test
 
@@ -171,9 +160,12 @@ public final class GameTest {
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7 6
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
             );
+        targetPosition   = new Position(5, 0);
+        direction        = 0;
+        step             = 3;
 
         game.setBoardState(boardState);
-        gameService.occupyPath(game, 5, 0, 0, 3);
+        gameService.occupyPath(game, targetPosition, direction, step);
 
         Assert.assertEquals(boardStateToText(game.getBoardState()), boardStateToText(targetBoardState));
 
@@ -205,9 +197,12 @@ public final class GameTest {
             Arrays.<Integer>asList(0, 1, 0, 0, 0, 0, 0, 0),     // 7 6
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
             );
+        targetPosition   = new Position(6, 1);
+        direction        = 1;
+        step             = 4;
 
         game.setBoardState(boardState);
-        gameService.occupyPath(game, 6, 1, 1, 4);
+        gameService.occupyPath(game, targetPosition, direction, step);
 
         Assert.assertEquals(boardStateToText(game.getBoardState()), boardStateToText(targetBoardState));
 
@@ -239,9 +234,12 @@ public final class GameTest {
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7 6
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
             );
+        targetPosition   = new Position(4, 1);
+        direction        = 2;
+        step             = 5;
 
         game.setBoardState(boardState);
-        gameService.occupyPath(game, 4, 1, 2, 5);
+        gameService.occupyPath(game, targetPosition, direction, step);
 
         Assert.assertEquals(boardStateToText(game.getBoardState()), boardStateToText(targetBoardState));
 
@@ -273,9 +271,12 @@ public final class GameTest {
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7 6
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
             );
+        targetPosition   = new Position(0, 1);
+        direction        = 3;
+        step             = 3;
 
         game.setBoardState(boardState);
-        gameService.occupyPath(game, 0, 1, 3, 3);
+        gameService.occupyPath(game, targetPosition, direction, step);
 
         Assert.assertEquals(boardStateToText(game.getBoardState()), boardStateToText(targetBoardState));
 
@@ -307,9 +308,12 @@ public final class GameTest {
             Arrays.<Integer>asList(0, 0, 0, 2, 0, 0, 0, 0),     // 7 6
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
             );
+        targetPosition   = new Position(0, 3);
+        direction        = 4;
+        step             = 2;
 
         game.setBoardState(boardState);
-        gameService.occupyPath(game, 0, 3, 4, 2);
+        gameService.occupyPath(game, targetPosition, direction, step);
 
         Assert.assertEquals(boardStateToText(game.getBoardState()), boardStateToText(targetBoardState));
 
@@ -341,9 +345,12 @@ public final class GameTest {
             Arrays.<Integer>asList(0, 1, 0, 0, 0, 0, 0, 0),     // 7 6
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
             );
+        targetPosition   = new Position(2, 5);
+        direction        = 5;
+        step             = 4;
 
         game.setBoardState(boardState);
-        gameService.occupyPath(game, 2, 5, 5, 4);
+        gameService.occupyPath(game, targetPosition, direction, step);
 
         Assert.assertEquals(boardStateToText(game.getBoardState()), boardStateToText(targetBoardState));
 
@@ -375,9 +382,12 @@ public final class GameTest {
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7 6
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
             );
+        targetPosition   = new Position(0, 7);
+        direction        = 6;
+        step             = 7;
 
         game.setBoardState(boardState);
-        gameService.occupyPath(game, 0, 7, 6, 7);
+        gameService.occupyPath(game, targetPosition, direction, step);
 
         Assert.assertEquals(boardStateToText(game.getBoardState()), boardStateToText(targetBoardState));
 
@@ -409,9 +419,12 @@ public final class GameTest {
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 1, 0),     // 7 6
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 1)      // 8 7
             );
+        targetPosition   = new Position(7, 7);
+        direction        = 7;
+        step             = 6;
 
         game.setBoardState(boardState);
-        gameService.occupyPath(game, 7, 7, 7, 6);
+        gameService.occupyPath(game, targetPosition, direction, step);
 
         Assert.assertEquals(boardStateToText(game.getBoardState()), boardStateToText(targetBoardState));
 
@@ -443,11 +456,39 @@ public final class GameTest {
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7 6
             Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
             );
+        targetPosition   = new Position(0, 0);
+        direction        = 2;
+        step             = 100;
 
         game.setBoardState(boardState);
-        gameService.occupyPath(game, 0, 0, 2, 100);
+        gameService.occupyPath(game, targetPosition, direction, step);
 
         Assert.assertEquals(boardStateToText(game.getBoardState()), boardStateToText(targetBoardState));
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
+    @Test
+    public void positionToStringTest() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+        Position position;
+
+        position = new Position(0, 0);
+        Assert.assertEquals(position.toString(), "a1");
+
+        position = new Position(0, 7);
+        Assert.assertEquals(position.toString(), "h1");
+
+        position = new Position(7, 0);
+        Assert.assertEquals(position.toString(), "a8");
+
+        position = new Position(7, 7);
+        Assert.assertEquals(position.toString(), "h8");
+
+        position = new Position(3, 3);
+        Assert.assertEquals(position.toString(), "d4");
     }
 
 

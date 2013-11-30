@@ -1,5 +1,5 @@
 
-package im.firat.reversi.reversistadium.exceptions;
+package im.firat.reversi.exceptions;
 
 
 public final class WrongOrderException extends Throwable {

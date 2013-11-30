@@ -1,5 +1,5 @@
 
-package im.firat.reversi.reversistadium.domain;
+package im.firat.reversi.domain;
 
 
 import java.io.Serializable;

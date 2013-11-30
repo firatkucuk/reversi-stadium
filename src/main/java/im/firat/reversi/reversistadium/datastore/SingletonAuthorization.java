@@ -2,7 +2,7 @@
 package im.firat.reversi.reversistadium.datastore;
 
 
-import im.firat.reversi.reversistadium.domain.Authorization;
+import im.firat.reversi.domain.Authorization;
 
 
 

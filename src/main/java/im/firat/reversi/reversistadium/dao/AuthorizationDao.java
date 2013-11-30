@@ -1,7 +1,7 @@
 
 package im.firat.reversi.reversistadium.dao;
 
-import im.firat.reversi.reversistadium.domain.Authorization;
+import im.firat.reversi.domain.Authorization;
 
 
 

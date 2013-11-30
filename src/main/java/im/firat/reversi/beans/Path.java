@@ -1,5 +1,5 @@
 
-package im.firat.reversi.reversistadium.beans;
+package im.firat.reversi.beans;
 
 
 import java.io.Serializable;
@@ -22,27 +22,19 @@ public final class Path implements Serializable {
 
     //~ --- [INSTANCE FIELDS] ------------------------------------------------------------------------------------------
 
-    private int direction;
-    private int step;
-    private int targetCol;
-    private int targetRow;
+    private final int      direction;
+    private final Position position;
+    private final int      step;
 
 
 
     //~ --- [CONSTRUCTORS] ---------------------------------------------------------------------------------------------
 
-    public Path(int targetRow, int targetCol, int direction, int step) {
+    public Path(final Position position, final int direction, final int step) {
 
-        this.targetRow = targetRow;
-        this.targetCol = targetCol;
+        this.position  = position;
         this.direction = direction;
         this.step      = step;
-    }
-
-
-
-    private Path() {
-
     }
 
 
@@ -58,26 +50,17 @@ public final class Path implements Serializable {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
+    public Position getPosition() {
+
+        return position;
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
     public int getStep() {
 
         return step;
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    public int getTargetCol() {
-
-        return targetCol;
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    public int getTargetRow() {
-
-        return targetRow;
     }
 }
