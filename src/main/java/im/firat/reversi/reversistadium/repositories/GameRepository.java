@@ -2,13 +2,13 @@
 package im.firat.reversi.reversistadium.repositories;
 
 
+import im.firat.reversi.domain.Game;
+import im.firat.reversi.exceptions.AlreadyStartedException;
+import im.firat.reversi.exceptions.IllegalMoveException;
+import im.firat.reversi.exceptions.NotStartedException;
+import im.firat.reversi.exceptions.WrongOrderException;
 import im.firat.reversi.reversistadium.dao.MemoryGameDaoImpl;
-import im.firat.reversi.reversistadium.domain.Game;
-import im.firat.reversi.reversistadium.exceptions.AlreadyStartedException;
-import im.firat.reversi.reversistadium.exceptions.IllegalMoveException;
-import im.firat.reversi.reversistadium.exceptions.NotStartedException;
-import im.firat.reversi.reversistadium.exceptions.WrongOrderException;
-import im.firat.reversi.reversistadium.services.GameService;
+import im.firat.reversi.services.GameService;
 
 
 

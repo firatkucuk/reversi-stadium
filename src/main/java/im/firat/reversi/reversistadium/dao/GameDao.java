@@ -1,7 +1,7 @@
 
 package im.firat.reversi.reversistadium.dao;
 
-import im.firat.reversi.reversistadium.domain.Game;
+import im.firat.reversi.domain.Game;
 
 
 

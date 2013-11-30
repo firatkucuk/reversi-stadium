@@ -2,8 +2,8 @@
 package im.firat.reversi.reversistadium.dao;
 
 
+import im.firat.reversi.domain.Authorization;
 import im.firat.reversi.reversistadium.datastore.SingletonAuthorization;
-import im.firat.reversi.reversistadium.domain.Authorization;
 
 
 

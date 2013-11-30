@@ -1,12 +1,12 @@
 package im.firat.reversi.reversistadium.repositories;
 
 
-import im.firat.reversi.reversistadium.core.Utils;
+import im.firat.reversi.core.Utils;
+import im.firat.reversi.domain.Authorization;
+import im.firat.reversi.exceptions.WrongCodeException;
 import im.firat.reversi.reversistadium.dao.AuthorizationDao;
 import im.firat.reversi.reversistadium.dao.MemoryAuthorizationDaoImpl;
-import im.firat.reversi.reversistadium.domain.Authorization;
-import im.firat.reversi.reversistadium.exceptions.WrongCodeException;
-import im.firat.reversi.reversistadium.services.GameService;
+import im.firat.reversi.services.GameService;
 
 
 

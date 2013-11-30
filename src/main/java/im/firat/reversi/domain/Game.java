@@ -1,14 +1,9 @@
 
-package im.firat.reversi.reversistadium.domain;
+package im.firat.reversi.domain;
 
-import im.firat.reversi.reversistadium.beans.Path;
-import im.firat.reversi.reversistadium.core.Utils;
-import im.firat.reversi.reversistadium.services.GameService;
+import im.firat.reversi.core.Utils;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import org.codehaus.jackson.annotate.JsonIgnore;
 
 
 
@@ -25,7 +20,7 @@ public class Game implements Serializable {
 
     //~ --- [INSTANCE FIELDS] ------------------------------------------------------------------------------------------
 
-    private Set<String>         availableMoves;
+    private List<String>        availableMoves;
     private List<List<Integer>> boardState;
     private boolean             cancelled;
     private int                 currentPlayer;
@@ -43,7 +38,7 @@ public class Game implements Serializable {
 
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
-    public Set<String> getAvailableMoves() {
+    public List<String> getAvailableMoves() {
 
         return availableMoves;
     }
@@ -88,7 +83,7 @@ public class Game implements Serializable {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public void setAvailableMoves(Set<String> availableMoves) {
+    public void setAvailableMoves(List<String> availableMoves) {
 
         this.availableMoves = availableMoves;
     }

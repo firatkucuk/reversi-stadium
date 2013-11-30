@@ -2,9 +2,9 @@
 package im.firat.reversi.reversistadium.controllers;
 
 
-import im.firat.reversi.reversistadium.domain.Authorization;
-import im.firat.reversi.reversistadium.domain.Game;
-import im.firat.reversi.reversistadium.exceptions.*;
+import im.firat.reversi.domain.Authorization;
+import im.firat.reversi.domain.Game;
+import im.firat.reversi.exceptions.*;
 import im.firat.reversi.reversistadium.repositories.AuthorizationRepository;
 import im.firat.reversi.reversistadium.repositories.GameRepository;
 import javax.ws.rs.*;

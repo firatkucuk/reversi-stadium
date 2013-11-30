@@ -1,10 +1,12 @@
 
-package im.firat.reversi.reversistadium.services;
+package im.firat.reversi.services;
 
 
-import im.firat.reversi.reversistadium.beans.Path;
-import im.firat.reversi.reversistadium.domain.Game;
-import im.firat.reversi.reversistadium.exceptions.*;
+import im.firat.reversi.beans.Path;
+import im.firat.reversi.beans.Position;
+import im.firat.reversi.core.Utils;
+import im.firat.reversi.domain.Game;
+import im.firat.reversi.exceptions.*;
 import java.util.*;
 
 
@@ -28,16 +30,13 @@ public final class GameService {
     public static final int WHITE_PLAYER = 2;
 
     // In class global constants
-    private static final String              BOARD_LETTERS           = "abcdefgh";
-    private static final String              BOARD_NUMBERS           = "12345678";
-    private static final char[]              BOARD_CHARS             = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
-    private static final Set<String>         INITIAL_AVAILABLE_MOVES;
+    private static final List<String>        INITIAL_AVAILABLE_MOVES;
     private static final List<List<Integer>> INITIAL_BOARD_STATE;
 
 
 
     static {
-        INITIAL_AVAILABLE_MOVES = new HashSet<String>(Arrays.asList("c4", "d3", "e6", "f5"));
+        INITIAL_AVAILABLE_MOVES = Arrays.asList("c4", "d3", "e6", "f5");
         INITIAL_BOARD_STATE     = Arrays.asList(
 
             //                     0  1  2  3  4  5  6  7
@@ -66,28 +65,6 @@ public final class GameService {
     //~ --- [METHODS] --------------------------------------------------------------------------------------------------
 
     /**
-     * Converts given location (row, col) to human readable board text
-     *
-     * @param   row  row value of given location
-     * @param   col  column value of given location
-     *
-     * @return  returns human readable location text. Converts (1, 7) to h2
-     */
-    public static String convertLocationToText(final int row, final int col) {
-
-        final StringBuilder text = new StringBuilder();
-
-        text.append(BOARD_CHARS[col]);
-        text.append(row + 1);
-
-        return text.toString();
-    }
-
-
-
-    //~ ----------------------------------------------------------------------------------------------------------------
-
-    /**
      * Returns translated position for required direction. If direction is other than range 0 - 7 then returns base
      * location.
      *
@@ -98,8 +75,7 @@ public final class GameService {
      *
      * If start position is c4 and step is 3 then target location is f4. Returns [3, 5]
      *
-     * @param   targetRow  start position row. 3 for f4 location
-     * @param   targetCol  start position col. 5 for f4 location
+     * @param   position   start position
      * @param   direction  direction number. Range 0 - 7
      * @param   step       translation distance
      *
@@ -107,38 +83,38 @@ public final class GameService {
      *
      * @throws  OutOfBoundsException
      */
-    public static int[] getTranslatedPosition(final int targetRow, final int targetCol, final int direction,
-            final int step) throws OutOfBoundsException {
+    public static Position getTranslatedPosition(final Position position, final int direction, final int step)
+        throws OutOfBoundsException {
 
-        int row = targetRow, col = targetCol;
+        int row = position.getRow(), col = position.getCol();
 
         if (direction == 0) {
-            row = targetRow - step;
+            row = position.getRow() - step;
         } else if (direction == 1) {
-            row = targetRow - step;
-            col = targetCol + step;
+            row = position.getRow() - step;
+            col = position.getCol() + step;
         } else if (direction == 2) {
-            col = targetCol + step;
+            col = position.getCol() + step;
         } else if (direction == 3) {
-            row = targetRow + step;
-            col = targetCol + step;
+            row = position.getRow() + step;
+            col = position.getCol() + step;
         } else if (direction == 4) {
-            row = targetRow + step;
+            row = position.getRow() + step;
         } else if (direction == 5) {
-            row = targetRow + step;
-            col = targetCol - step;
+            row = position.getRow() + step;
+            col = position.getCol() - step;
         } else if (direction == 6) {
-            col = targetCol - step;
+            col = position.getCol() - step;
         } else if (direction == 7) {
-            row = targetRow - step;
-            col = targetCol - step;
+            row = position.getRow() - step;
+            col = position.getCol() - step;
         }
 
         if (row < 0 || col < 0 || row > 7 || col > 7) {
             throw new OutOfBoundsException();
         }
 
-        return new int[] { row, col };
+        return new Position(row, col);
     }
 
 
@@ -160,22 +136,23 @@ public final class GameService {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public Map<String, List<Path>> findAllAvailablePaths(final Game game, final int player) {
+    public Map<Position, List<Path>> findAllAvailablePaths(final Game game, final int player) {
 
-        final Map<String, List<Path>> playerPaths = new HashMap<String, List<Path>>();
+        final Map<Position, List<Path>> availablePaths = new HashMap<Position, List<Path>>();
 
         for (int row = 0; row < 8; row++) {
 
             for (int col = 0; col < 8; col++) {
-                Map<String, List<Path>> availablePaths = findAvailablePaths(game, row, col, player);
+                final Position                  position      = new Position(row, col);
+                final Map<Position, List<Path>> positionPaths = findAvailablePaths(game, position, player);
 
-                if (availablePaths != null && !availablePaths.isEmpty()) {
-                    playerPaths.putAll(availablePaths);
+                if (positionPaths != null && !positionPaths.isEmpty()) {
+                    availablePaths.putAll(positionPaths);
                 }
             }
         }
 
-        return playerPaths;
+        return availablePaths;
     }
 
 
@@ -197,46 +174,44 @@ public final class GameService {
      * <li>Pattern should start with same color according to current player</li>
      * </ol>
      *
-     * @param   targetRow  row value of target location
-     * @param   targetCol  col value of target location
-     * @param   player     player value for pattern validation
+     * @param   game      current game
+     * @param   position  target position
+     * @param   player    player value for pattern validation
      *
      * @return  Returns found path if valid pattern found.
      */
-    public Map<String, List<Path>> findAvailablePaths(final Game game, final int targetRow, final int targetCol,
-            final int player) {
+    public Map<Position, List<Path>> findAvailablePaths(final Game game, final Position position, final int player) {
 
         final List<List<Integer>> boardState = game.getBoardState();
 
-        if (boardState.get(targetRow).get(targetCol) != EMPTY_PLACE) {
+        if (boardState.get(position.getRow()).get(position.getCol()) != EMPTY_PLACE) {
             return null;
         }
 
-        final Map<String, List<Path>> playerPaths     = new HashMap<String, List<Path>>();
-        final int                     DIFFERENT_COLOR = player == WHITE_PLAYER ? BLACK_DISK : WHITE_DISK;
-        final int                     SAME_COLOR      = player; // Redundant constant for code readability
+        final Map<Position, List<Path>> playerPaths     = new HashMap<Position, List<Path>>();
+        final int                       DIFFERENT_COLOR = player == WHITE_PLAYER ? BLACK_DISK : WHITE_DISK;
+        final int                       SAME_COLOR      = player; // Redundant constant for code readability
 
         for (int direction = 0; direction < 8; direction++) {
 
-            int value = getPositionValue(game, targetRow, targetCol, direction, 1);
+            int value = getPositionValue(game, position, direction, 1);
 
             if (value == DIFFERENT_COLOR) {
 
                 for (int step = 2; step < 8; step++) {
 
-                    value = getPositionValue(game, targetRow, targetCol, direction, step);
+                    value = getPositionValue(game, position, direction, step);
 
                     if (value == END_OF_DIRECTION || value == EMPTY_PLACE) {
                         break;
                     } else if (value == SAME_COLOR) {
-                        String     position = convertLocationToText(targetRow, targetCol);
-                        List<Path> paths    = playerPaths.get(position);
+                        List<Path> paths = playerPaths.get(position);
 
                         if (paths == null) {
                             paths = new ArrayList<Path>();
                         }
 
-                        paths.add(new Path(targetRow, targetCol, direction, step));
+                        paths.add(new Path(position, direction, step));
                         playerPaths.put(position, paths);
 
                         break;
@@ -263,22 +238,19 @@ public final class GameService {
      *
      * If start position is c4 and step is 3 then target location is f4 and the value is 1.
      *
-     * @param   row        start position row. 3 for f4 location
-     * @param   col        start position col. 5 for f4 location
+     * @param   position   start position
      * @param   direction  direction number. Range 0 - 7
      * @param   step       translation distance
      *
      * @return  -1 for out of bound locations, 0 for empty locations, 1 for black disk, 2 for white disk
      */
-    public int getPositionValue(final Game game, final int row, final int col, final int direction, final int step) {
+    public int getPositionValue(final Game game, final Position position, final int direction, final int step) {
 
         try {
-            final int[]               position      = getTranslatedPosition(row, col, direction, step);
-            final int                 translatedRow = position[0];
-            final int                 translatedCol = position[1];
-            final List<List<Integer>> boardState    = game.getBoardState();
+            final Position            translatedPosition = getTranslatedPosition(position, direction, step);
+            final List<List<Integer>> boardState         = game.getBoardState();
 
-            return boardState.get(translatedRow).get(translatedCol);
+            return boardState.get(translatedPosition.getRow()).get(translatedPosition.getCol());
         } catch (OutOfBoundsException ex) {
             return END_OF_DIRECTION;
         }
@@ -301,13 +273,10 @@ public final class GameService {
             throw new WrongOrderException();
         }
 
-        final char[] chars = piece.toCharArray();
-        final int    col   = BOARD_LETTERS.indexOf(chars[0]);
-        final int    row   = BOARD_NUMBERS.indexOf(chars[1]);
+        Position                  position    = new Position(piece);
+        Map<Position, List<Path>> playerPaths = findAvailablePaths(game, position, currentPlayer);
 
-        Map<String, List<Path>> playerPaths = findAvailablePaths(game, row, col, currentPlayer);
-
-        occupyPaths(game, playerPaths, row, col);
+        occupyPaths(game, playerPaths, position);
 
         final int otherPlayer = currentPlayer == BLACK_PLAYER ? WHITE_PLAYER : BLACK_PLAYER;
 
@@ -315,11 +284,11 @@ public final class GameService {
 
             // if have legal moves for other player
             game.setCurrentPlayer(otherPlayer);
-            game.setAvailableMoves(playerPaths.keySet());
+            game.setAvailableMoves(Utils.positionSet2StringList(playerPaths.keySet()));
         } else if (!(playerPaths = findAllAvailablePaths(game, currentPlayer)).isEmpty()) {
 
             // if have legal moves for current player
-            game.setAvailableMoves(playerPaths.keySet());
+            game.setAvailableMoves(Utils.positionSet2StringList(playerPaths.keySet()));
         } else {
             game.setStarted(false);
             game.setCurrentPlayer(NO_PLAYER);
@@ -350,7 +319,7 @@ public final class GameService {
      */
     public void occupyPath(final Game game, final Path path) {
 
-        occupyPath(game, path.getTargetRow(), path.getTargetCol(), path.getDirection(), path.getStep());
+        occupyPath(game, path.getPosition(), path.getDirection(), path.getStep());
     }
 
 
@@ -372,13 +341,11 @@ public final class GameService {
          4  [2] [2] [2] [2] [0]  >>> direction 2
      * </pre>
      *
-     * @param  targetRow  start position row. 3 for f4 location
-     * @param  targetCol  start position col. 5 for f4 location
+     * @param  position   start position
      * @param  direction  direction number. Range 0 - 7
      * @param  step       translation distance
      */
-    public void occupyPath(final Game game, final int targetRow, final int targetCol, final int direction,
-            final int step) {
+    public void occupyPath(final Game game, final Position position, final int direction, final int step) {
 
         final List<List<Integer>> boardState    = game.getBoardState();
         final int                 currentPlayer = game.getCurrentPlayer();
@@ -386,13 +353,11 @@ public final class GameService {
         for (int i = 0; i < step; i++) {
 
             try {
-                final int[] position = getTranslatedPosition(targetRow, targetCol, direction, i);
-                final int   row      = position[0];
-                final int   col      = position[1];
+                final Position translatedPosition = getTranslatedPosition(position, direction, i);
 
                 // player constants and disk constants are equivalent. So can be used "currentPlayer" for
                 // current player's disk color.
-                boardState.get(row).set(col, currentPlayer);
+                boardState.get(translatedPosition.getRow()).set(translatedPosition.getCol(), currentPlayer);
             } catch (OutOfBoundsException ex) {
                 break;
             }
@@ -403,12 +368,12 @@ public final class GameService {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public void occupyPaths(final Game game, final Map<String, List<Path>> playerPaths, final int targetRow,
-            final int targetCol) throws IllegalMoveException {
+    public void occupyPaths(final Game game, final Map<Position, List<Path>> playerPaths, final Position position)
+        throws IllegalMoveException {
 
         if (playerPaths != null && !playerPaths.isEmpty()) {
 
-            final List<Path> foundPaths = playerPaths.get(convertLocationToText(targetRow, targetCol));
+            final List<Path> foundPaths = playerPaths.get(position);
 
             if (foundPaths != null && !foundPaths.isEmpty()) {
 

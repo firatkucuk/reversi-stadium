@@ -2,8 +2,8 @@
 package im.firat.reversi.reversistadium.dao;
 
 
+import im.firat.reversi.domain.Game;
 import im.firat.reversi.reversistadium.datastore.SingletonGame;
-import im.firat.reversi.reversistadium.domain.Game;
 
 
 

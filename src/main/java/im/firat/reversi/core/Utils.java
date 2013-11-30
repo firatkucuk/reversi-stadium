@@ -1,9 +1,12 @@
 
-package im.firat.reversi.reversistadium.core;
+package im.firat.reversi.core;
 
-import im.firat.reversi.reversistadium.services.GameService;
+import im.firat.reversi.beans.Position;
+import im.firat.reversi.services.GameService;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 
 
@@ -91,5 +94,20 @@ public final class Utils {
         }
 
         return text.append(ROW_HEADER).toString();
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
+    public static List<String> positionSet2StringList(Set<Position> positionSet) {
+
+        List<String> keyList = new ArrayList<String>();
+
+        for (Position position : positionSet) {
+            keyList.add(position.toString());
+        }
+
+        return keyList;
     }
 }

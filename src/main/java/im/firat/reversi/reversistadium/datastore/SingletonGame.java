@@ -2,7 +2,7 @@
 package im.firat.reversi.reversistadium.datastore;
 
 
-import im.firat.reversi.reversistadium.domain.Game;
+import im.firat.reversi.domain.Game;
 
 
 
