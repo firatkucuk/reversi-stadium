@@ -29,29 +29,6 @@ public final class GameService {
     public static final int BLACK_PLAYER = 1;
     public static final int WHITE_PLAYER = 2;
 
-    // In class global constants
-    private static final List<String>        INITIAL_AVAILABLE_MOVES;
-    private static final List<List<Integer>> INITIAL_BOARD_STATE;
-
-
-
-    static {
-        INITIAL_AVAILABLE_MOVES = Arrays.asList("c4", "d3", "e6", "f5");
-        INITIAL_BOARD_STATE     = Arrays.asList(
-
-            //                     0  1  2  3  4  5  6  7
-            //                     a  b  c  d  e  f  g  h
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 1 0
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 2 1
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 3 2
-            Arrays.<Integer>asList(0, 0, 0, 2, 1, 0, 0, 0),     // 4 3
-            Arrays.<Integer>asList(0, 0, 0, 1, 2, 0, 0, 0),     // 5 4
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 6 5
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0),     // 7 6
-            Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)      // 8 7
-            );
-    }
-
 
 
     //~ --- [CONSTRUCTORS] ---------------------------------------------------------------------------------------------
@@ -260,7 +237,7 @@ public final class GameService {
 
     //~ ----------------------------------------------------------------------------------------------------------------
 
-    public void move(final Game game, final String piece, final int player) throws NotStartedException,
+    public synchronized void move(final Game game, final String piece, final int player) throws NotStartedException,
         WrongOrderException, IllegalMoveException {
 
         if (!game.isStarted()) {
@@ -275,6 +252,10 @@ public final class GameService {
 
         Position                  position    = new Position(piece);
         Map<Position, List<Path>> playerPaths = findAvailablePaths(game, position, currentPlayer);
+
+        if (playerPaths == null || playerPaths.isEmpty()) {
+            throw new IllegalMoveException();
+        }
 
         occupyPaths(game, playerPaths, position);
 
@@ -399,7 +380,19 @@ public final class GameService {
         game.setStarted(true);
         game.setCancelled(false);
         game.setCurrentPlayer(BLACK_PLAYER);
-        game.setBoardState(INITIAL_BOARD_STATE);
-        game.setAvailableMoves(INITIAL_AVAILABLE_MOVES);
+        game.setBoardState(Arrays.asList(
+
+                //                     0  1  2  3  4  5  6  7
+                //                     a  b  c  d  e  f  g  h
+                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0), // 1 0
+                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0), // 2 1
+                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0), // 3 2
+                Arrays.<Integer>asList(0, 0, 0, 2, 1, 0, 0, 0), // 4 3
+                Arrays.<Integer>asList(0, 0, 0, 1, 2, 0, 0, 0), // 5 4
+                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0), // 6 5
+                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0), // 7 6
+                Arrays.<Integer>asList(0, 0, 0, 0, 0, 0, 0, 0)  // 8 7
+                ));
+        game.setAvailableMoves(Arrays.asList("c4", "d3", "e6", "f5"));
     }
 }

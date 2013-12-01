@@ -106,6 +106,53 @@ public final class GameTest {
 
     @SuppressWarnings("unchecked")
     @Test
+    public void illegalMoveScenarioTest() throws AlreadyStartedException, WrongOrderException, NotStartedException {
+
+        try {
+            final GameService gameService = new GameService();
+            final Game        game        = new Game();
+
+            gameService.start(game);
+
+            gameService.move(game, "d3", BLACK_PLAYER);
+            gameService.move(game, "c5", WHITE_PLAYER);
+            gameService.move(game, "f6", BLACK_PLAYER);
+            gameService.move(game, "f5", WHITE_PLAYER);
+            gameService.move(game, "c6", BLACK_PLAYER);
+            gameService.move(game, "e3", WHITE_PLAYER);
+            gameService.move(game, "f3", BLACK_PLAYER);
+            gameService.move(game, "f4", WHITE_PLAYER);
+            gameService.move(game, "g6", BLACK_PLAYER);
+            gameService.move(game, "e2", WHITE_PLAYER);
+
+            gameService.move(game, "d1", BLACK_PLAYER);
+            gameService.move(game, "c2", WHITE_PLAYER);
+            gameService.move(game, "b3", BLACK_PLAYER);
+            gameService.move(game, "f1", WHITE_PLAYER);
+            gameService.move(game, "b5", BLACK_PLAYER);
+            gameService.move(game, "f2", WHITE_PLAYER);
+            gameService.move(game, "g1", BLACK_PLAYER);
+            gameService.move(game, "h1", WHITE_PLAYER);
+            gameService.move(game, "g3", BLACK_PLAYER);
+            gameService.move(game, "d2", WHITE_PLAYER);
+
+            gameService.move(game, "d6", BLACK_PLAYER);
+            gameService.move(game, "d6", WHITE_PLAYER);
+        } catch (IllegalMoveException e) {
+            assert true;
+
+            return;
+        }
+
+        assert false;
+    }
+
+
+
+    //~ ----------------------------------------------------------------------------------------------------------------
+
+    @SuppressWarnings("unchecked")
+    @Test
     public void occupyPathTest() throws NoSuchFieldException, IllegalAccessException, NoSuchMethodException,
         InvocationTargetException {
 

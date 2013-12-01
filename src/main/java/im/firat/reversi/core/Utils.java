@@ -90,7 +90,7 @@ public final class Utils {
                 }
             }
 
-            text.append(" ").append(rowValue).append("\n");
+            text.append(rowValue).append("\n");
         }
 
         return text.append(ROW_HEADER).toString();
